@@ -1,0 +1,732 @@
+@font-face {
+	font-family: manaikhoroo;
+	src: url('fonts/Roboto-Regular.ttf');
+}
+
+#login-box {
+	width: 280px;
+	margin: 0 auto;
+	background: #FFF;
+	margin-top: 200px;
+	border-radius: 5px;
+	box-shadow: 2px 3px 4px 0 #000000;
+	-webkit-box-shadow: 2px 3px 4px 0 #000000;
+	-moz-box-shadow: 2px 3px 4px 0 #000000;
+}
+
+#login-wrapper {
+	background: #002586 url('images/admin/login-bg.jpg') no-repeat center 0;
+	font-family: manaikhoroo;
+}
+
+.login-header {
+	background: #553982;
+	color: #FFF;
+	padding: 15px;
+	font-size: 18px;
+	text-align: center;
+	text-shadow: 1px 2px 2px #000000;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.login-input {
+	padding: 15px 25px;
+}
+
+.login-label {
+	font-size: 16px;
+	color: #553982;
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+.form-group {
+	margin-bottom: 25px;
+}
+
+.login-btn {
+	text-align: center;
+}
+
+#marker-map {
+	margin: 0;
+	padding: 0;
+	height: 500px;
+}
+
+.info-block-desc {
+	font-size: 14px;
+}
+
+.info-block-info {
+	font-size: 30px;
+	padding: 10px 0;
+}
+
+.row-admin {
+	margin-bottom: 25px;
+	padding-left: 20px;
+}
+
+.row-admin2 {
+	margin-bottom: 25px;
+}
+
+.row-title {
+	font-size: 24px;
+	margin-bottom: 15px;
+	padding-left: 20px;
+	padding-top: 20px;
+}
+
+.saveDesc {
+	font-size: 14px;
+	font-weight: 600;
+	margin-bottom: 20px;
+}
+
+.saveChoice {
+	background: #2969b0;
+	display: block;
+	float: left;
+	width: 60px;
+	margin: 0 10px;
+	text-align: center;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.saveChoice:hover {
+	background: #41a85f;
+	color: #FFF;
+	text-decoration: none;
+}
+
+.info-box {
+	height: 200px;
+}
+
+.info-box2 {
+	height: 160px;
+	background: #475577 !important;
+	padding: 10px !important;
+}
+
+ul.dashboard-list .avatar {
+	height: 45px !important;
+	width: 37px !important;
+}
+
+.sanal-full {
+	padding: 15px;
+	background: #EEE;
+}
+
+.sanal-inforow span {
+	color: #222222;
+	font-weight: bold;
+}
+
+.content-title {
+	font-weight: bold;
+	color: #222;
+}
+
+.sanal-content {
+	margin: 15px 0;
+}
+
+.sanal-file a {
+	background: #2d89ef;
+	padding: 10px;
+	color: #FFF;
+	display: block;
+	text-align: center;
+	width: 150px;
+}
+
+.sanal-file a:hover {
+	background: #00a300;
+	color: #FFF;
+	text-decoration: none;
+}
+
+.reply-box {
+	padding: 15px;
+	background: #EEE;
+}
+
+.reply-box-title {
+	font-weight: bold;
+	font-size: 14px;
+	margin-bottom: 20px;
+}
+
+.reply-box textarea {
+	width: 100%;
+}
+
+.backHome {
+	text-align: center;
+	margin-top: 15px;
+	display: block;
+}
+
+#sectionLists table {
+	border-collapse: collapse;
+}
+
+#sectionLists th {
+	border: 1px solid #000;
+}
+
+#sectionLists td {
+	border: 1px solid #000;
+	text-align: center;
+	padding: 5px 0;
+}
+
+#sectionDesc {
+	margin: 15px 0;
+}
+
+.sectionDesc {
+	padding: 8px 0;
+}
+
+.secConfirm {
+	background: #00a300;
+	display: block;
+	width: 50px;
+	height: 16px;
+	float: left;
+	margin-right: 10px;
+}
+
+.secNotConfirm {
+	background: #eb3c00;
+	display: block;
+	width: 50px;
+	height: 16px;
+	float: left;
+	margin-right: 10px;
+}
+
+.descInput label {
+	font-size: 12px;
+	line-height: 12px;
+}
+
+.descInput {
+	overflow: hidden;
+	width: 250px;
+}
+
+.descInput textarea, .descInput input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="file"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+	border: 1px solid #888 !important;
+	font-size: 12px;
+	line-height: 12px;
+	padding: 5px 6px;
+}
+
+.descInput input[type="file"] {
+	width: 240px;
+}
+
+.descInput img {
+	width: 180px;
+	margin-bottom: 10px;
+}
+
+.saveDesc {
+	font-size: 12px;
+	line-height: 12px;
+	display: block;
+	padding: 10px 15px;
+	width: 110px;
+	text-align: center;
+	color: #FFF;
+	background: #1e9905;
+	text-decoration: none;
+}
+
+.saveDesc:hover {
+	background: #0b3902;
+	color: #FFF;
+	text-decoration: none;
+}
+
+.regionCheckRow {
+	overflow: hidden;
+}
+
+.regionCheckBlock {
+	float: left;
+	margin-right: 25px;
+	width: 160px;
+	display: block;
+}
+
+.regionCheckTitle {
+	margin-bottom: 5px;
+}
+
+.regionCheckBlock input {
+	float: left;
+	margin-right: 3px;
+}
+
+.regionCheckBlock label {
+	float: left;
+	margin-right: 3px;
+}
+
+.regionCheckBlock .checker {
+	float: left;
+	margin-right: 2px; 
+	margin-top: 0 !important;
+}
+
+.sentUserList {
+	font-size: 10px !important;
+	line-height: 10px !important;
+	margin-bottom: 4px;
+}
+
+.newMessageIcon {
+	font-size: 12px;
+	line-height: 12px;
+	padding: 4px 6px;
+	border-radius: 8px;
+	display: block;
+	float: right;
+	background: #000;
+	color: #FFF;
+}
+
+#paginationBlock {
+	overflow: hidden;
+}
+
+.paginationLink {
+	font-size: 11px;
+	line-height: 11px;
+	display: block;
+	float: left;
+	background: #555;
+	color: #FFF;
+	padding: 4px 3px;
+	margin: 3px;
+}
+
+.tableSearch {
+	overflow: hidden;
+}
+
+.searchBlock {
+	float: left;
+	display: block;
+	margin: 0 10px;
+}
+
+.searchBtn {
+	margin-top: 20px;
+}
+
+.userGroupTitle {
+	font-size: 12px;
+	line-height: 12px;
+	background: #1d1d1d;
+	color: #FFF;
+	padding: 5px 15px;
+	overflow: hidden;
+}
+
+.userDistrictTitle {
+	font-size: 12px;
+	line-height: 12px;
+	background: #CCC;
+	color: #000;
+	padding: 4px 10px;
+	overflow: hidden;
+}
+
+.userDistrictBlock .checker {
+	float: left;
+	margin-right: 5px;
+}
+
+.userDistrictRegionBlock .checker {
+	float: left;
+	margin-right: 5px;
+}
+
+.userDistrictRegionBlock {
+	margin-bottom: 7px;
+}
+
+.userDistrictRegionRow {
+	overflow: hidden;
+	border: 1px solid #CCC;
+	padding: 4px 8px;
+}
+
+.userDistrictRegionBlock {
+	float: left;
+	margin-right: 8px;
+	overflow: hidden;
+	width: 100px;
+}
+
+.userDistrictRegionBlock label {
+	font-size: 12px;
+	line-height: 26px;
+}
+
+.userDistrictRegionCheck {
+	float: left;
+	margin-bottom: 0 !important;
+	height: 25px;
+}
+
+.userDistrictBlock {
+	float: left;
+	width: 230px;
+}
+
+.userDistrictBlock label {
+	font-size: 12px;
+	line-height: 24px;
+}
+
+.userDistrictCheck {
+	float: left;
+	margin-bottom: 0 !important;
+	height: 15px;
+}
+
+.userAgencyBlock {
+	float: left;
+	width: 305px;
+}
+
+.userAgencyBlock label {
+	font-size: 12px;
+	line-height: 24px;
+}
+
+.userAgencyCheck {
+	float: left;
+	margin-bottom: 0 !important;
+	height: 28px;
+}
+
+.userAdminCheck {
+	float: left;
+	margin-right: 10px;
+}
+
+#CheckAllDistricts {
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 0;
+	height: 15px;
+}
+
+#CheckAllRegions {
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 0;
+	height: 15px;
+}
+
+#CheckAllAgencies {
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 0;
+	height: 15px;
+}
+
+.dataFormBock input.checkAllRegs {
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 0;
+	height: 15px;
+}
+
+.msgText p {
+	font-size: 12px;
+	line-height:14px; 
+}
+
+.msgText li {
+	font-size: 12px;
+	line-height: 14px;
+}
+
+.msgBlockTable {
+	border: none;
+	border-collapse: collapse;
+}
+
+.msgBlockTable th {
+	background: #333;
+	color: #FFF;
+	font-size: 12px;
+	line-height: 12px;
+	padding: 5px 8px;
+	border: 1px solid #333;
+	text-align: center;
+}
+
+.msgBlockTable td {
+	font-size: 12px;
+	line-height: 14px;
+	padding: 4px 6px;
+	border: 1px solid #333;
+}
+
+.msgBlockTable p {
+	font-size: 12px;
+	line-height: 14px;
+}
+
+.msgBlockTable li {
+	font-size: 12px;
+	line-height: 14px;
+}
+
+.printBtnRow2 {
+	display: block;
+	overflow: hidden;
+	margin-bottom: 20px;
+	padding-left: 20px;
+}
+
+.printBtn2 {
+	background: #9044b0;
+	color: #FFF;
+	padding: 7px 15px;
+	font-size: 14px;
+	line-height: 14px;
+	display: block;
+	width: 120px;
+	text-align: center;
+}
+
+.printBtn2:hover {
+	background: #9d5ab9;
+	color: #FFF;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.saveDescBtn {
+	display: block;
+	text-align: center;
+	background: #26af61;
+	color: #FFF;
+	padding: 5px 10px;
+	width: 100px;
+}
+
+.saveDescBtn:hover {
+	cursor: pointer;
+}
+
+#drawInfoWindow {
+	overflow: hidden;
+}
+
+.buttonDrawPolygon {
+	float: left;
+	margin: 0 8px;
+}
+
+.saveDrawPolygonBtn {
+	font-size: 12px;
+	line-height: 12px;
+	padding: 7px 10px;
+	color: #FFF;
+	background: #26af61;
+	border: none;
+}
+
+.deleteDrawPolygonBtn:hover {
+	color: #FFF;
+	background: #c03a2e;
+	text-decoration: none;
+}
+
+.deleteDrawPolygonBtn {
+	font-size: 12px;
+	line-height: 12px;
+	padding: 7px 10px;
+	color: #FFF;
+	background: #e94c3d;
+	display: block;
+}
+
+.editDrawPolygonBtn {
+	font-size: 12px;
+	line-height: 12px;
+	padding: 7px 10px;
+	color: #FFF;
+	background: #3598db;
+	display: block;
+}
+
+.editDrawPolygonBtn:hover {
+	color: #FFF;
+	background: #2882b7;
+	text-decoration: none;
+}
+
+.quick-button-link {
+	color: #FFF;
+}
+
+.inputRow {
+	overflow: hidden;
+	display: block;
+	padding-left: 15px;
+}
+
+.inputBlock {
+	float: left;
+	margin-right: 15px;
+}
+
+.inputBlock3 {
+	float: left;
+	margin-right: 15px;
+}
+
+.inputBlock label {
+	font-size: 12px;
+	line-height: 12px;
+	color: #333;
+}
+
+.inputBlock2 {
+	float: left;
+	margin-right: 15px;
+}
+
+.inputBlock2 label {
+	font-size: 12px;
+	line-height: 12px;
+	color: #333;
+}
+
+.container-fluid-full #content {
+	padding: 0px !important;
+}
+
+.breadcrumb {
+	display: none;
+}
+
+.inputRow2 {
+	position: absolute;
+	top: 40px;
+	right: 100px;
+	z-index: 50000;
+}
+
+.inputRow3 {
+	position: absolute;
+	top: 100px;
+	right: 100px;
+	z-index: 50000;
+}
+
+@media print {
+	.breadcrumb {
+		display: none;
+	}
+	.row-title {
+		font-size: 16pt;
+		line-height: 16pt;
+		margin-bottom: 16pt;
+		text-align: center;
+	}
+	.info-box {
+		display: none;
+	}
+	.brand span {
+		display: none;
+	}
+	
+	.navbar {
+		display: none;
+	}
+	
+	.row-admin {
+		display: none;
+	}
+	
+	.printBtnRow2 {
+		display: none;
+	}
+	
+	.box {
+		border: 0px solid #EEE;
+	}
+	
+	.row-admin2 {
+		overflow: hidden;
+		margin-bottom: 25px;
+	}
+	
+	.info-box2 {
+		float: left;
+		width: 15%;
+		overflow: hidden;
+	}
+	
+	.info-block-desc {
+		font-size: 10pt;
+		line-height: 14pt;
+	}
+	
+	.info-block-info {
+		font-size: 16pt;
+		line-height: 16pt;
+	}
+	
+	.span11 {
+		width: 100%;
+	}
+	
+	.span10 {
+		width: 100%;
+	}
+	
+	video {
+		display: none;
+	}
+	
+	.markerBtn {
+		display: none;
+	}
+	
+	.markerBoxTitle {
+		display: none;
+	}
+	
+	#content {
+		width: 100%;
+	}
+	
+	.markerBox {
+		border: 0px solid #EEE;
+	}
+	
+	.row-title {
+		font-size: 14pt;
+		line-height: 16pt;
+	}
+}

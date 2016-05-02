@@ -1,0 +1,6 @@
+<IfModule mod_rewrite.c>
+Options +FollowSymlinks
+RewriteEngine on
+RewriteRule (.*)\.html$ index.php?action=$1
+
+</IfModule>

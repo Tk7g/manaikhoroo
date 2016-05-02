@@ -1,0 +1,168 @@
+@font-face {
+	font-family: manaikhoroo;
+	src: url('fonts/Roboto-Regular.ttf');
+}
+
+#login-box {
+	width: 280px;
+	margin: 0 auto;
+	background: #FFF;
+	margin-top: 200px;
+	border-radius: 5px;
+	box-shadow: 2px 3px 4px 0 #000000;
+	-webkit-box-shadow: 2px 3px 4px 0 #000000;
+	-moz-box-shadow: 2px 3px 4px 0 #000000;
+}
+
+#login-wrapper {
+	background: #002586 url('images/admin/login-bg.jpg') no-repeat center 0;
+	font-family: manaikhoroo;
+}
+
+.login-header {
+	background: #553982;
+	color: #FFF;
+	padding: 15px;
+	font-size: 18px;
+	text-align: center;
+	text-shadow: 1px 2px 2px #000000;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.login-input {
+	padding: 15px 25px;
+}
+
+.login-label {
+	font-size: 16px;
+	color: #553982;
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+.form-group {
+	margin-bottom: 25px;
+}
+
+.login-btn {
+	text-align: center;
+}
+
+#marker-map {
+	margin: 0;
+	padding: 0;
+	height: 500px;
+}
+
+.info-block-desc {
+	font-size: 14px;
+}
+
+.info-block-info {
+	font-size: 30px;
+	padding: 10px 0;
+}
+
+.row-admin {
+	margin-bottom: 25px;
+}
+
+.row-title {
+	font-size: 26px;
+	margin-bottom: 15px;
+}
+
+.saveDesc {
+	font-size: 14px;
+	font-weight: 600;
+	margin-bottom: 20px;
+}
+
+.saveChoice {
+	background: #2969b0;
+	display: block;
+	float: left;
+	width: 60px;
+	margin: 0 10px;
+	text-align: center;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.saveChoice:hover {
+	background: #41a85f;
+	color: #FFF;
+	text-decoration: none;
+}
+
+.info-box {
+	height: 200px;
+}
+
+.info-box2 {
+	height: 160px;
+	background: #475577 !important;
+	padding: 10px !important;
+}
+
+ul.dashboard-list .avatar {
+	height: 45px !important;
+	width: 37px !important;
+}
+
+.sanal-full {
+	padding: 15px;
+	background: #EEE;
+}
+
+.sanal-inforow span {
+	color: #222222;
+	font-weight: bold;
+}
+
+.content-title {
+	font-weight: bold;
+	color: #222;
+}
+
+.sanal-content {
+	margin: 15px 0;
+}
+
+.sanal-file a {
+	background: #2d89ef;
+	padding: 10px;
+	color: #FFF;
+	display: block;
+	text-align: center;
+	width: 150px;
+}
+
+.sanal-file a:hover {
+	background: #00a300;
+	color: #FFF;
+	text-decoration: none;
+}
+
+.reply-box {
+	padding: 15px;
+	background: #EEE;
+}
+
+.reply-box-title {
+	font-weight: bold;
+	font-size: 14px;
+	margin-bottom: 20px;
+}
+
+.reply-box textarea {
+	width: 100%;
+}
+
+.backHome {
+	text-align: center;
+	margin-top: 15px;
+	display: block;
+}
