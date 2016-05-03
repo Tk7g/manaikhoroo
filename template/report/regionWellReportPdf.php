@@ -5,7 +5,6 @@ include(SITE_TEMPLATE. "header-report2.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-blue2.png'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="profileHeader">
 					<div class="profileCol1">
@@ -138,7 +137,7 @@ include(SITE_TEMPLATE. "header-report2.php");
 									<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/pop-color1.jpg'; ?>" />
 								</div>
 								<div class="reportDetailDesc">
-									<?php 
+									<?php
 										echo number_format($breaks[1], 2).' - '.number_format($breaks[2],2);
 									?>
 								</div>
@@ -207,11 +206,11 @@ include(SITE_TEMPLATE. "header-report2.php");
 	var iconBus = [];
 	var iconLight = [];
 	var busCircle = [];
-	
+
 	<?php foreach($regions as $reg) : ?>
 	var regionArea<?php echo $reg['id']; ?>;
 	<?php endforeach; ?>
-	
+
 	<?php foreach($sections as $sec) : ?>
 		var sectionCoord<?php echo $sec['id']; ?> = [];
 	<?php endforeach; ?>
@@ -228,7 +227,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 <?php
@@ -250,13 +249,13 @@ function initialize() {
 		scaleControl: false,
 		streetViewControl: false,
 		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+
 	};
 	map = new google.maps.Map(document.getElementById('profileMainMap'),
       mapOptions);
 	mapLarge = new google.maps.Map(document.getElementById('reportMapBox'),
       mapOptions1);
-	
+
 mapLarge.set('styles', [
   {
     featureType: 'road',
@@ -267,7 +266,7 @@ mapLarge.set('styles', [
     ]
   }
 ]);
-	
+
 	addWalk(<?php echo $region['id']; ?>, "#195734", 100, 0.7, 2, mapLarge);
 	addWalk(<?php echo $region['id']; ?>, "#8ba686", 200, 0.5, 2, mapLarge);
 	addWalk(<?php echo $region['id']; ?>, "#cfd4c1", 300, 0.4, 2, mapLarge);
@@ -290,7 +289,7 @@ mapLarge.set('styles', [
 	<?php endforeach; ?>
 	regionBorder(<?php echo $_GET['district']; ?>, <?php echo $_GET['region']; ?>, mapLarge);
 	addMarker(<?php echo $region['id']; ?>, 2, '<?php echo MAIN_FOLDER."/images/reportProfile/well.png"; ?>', mapLarge, iconBus);
-	
+
 	fitBoundary(<?php echo $region['id']; ?>, map);
 <?php
 	if(!in_array($_GET['district'], array(1, 2))) {
@@ -510,7 +509,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 

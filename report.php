@@ -135,9 +135,9 @@ function yearRegionReport() {
 
 function districtBusReport() {
 	$district = District::getDistrict($_GET['district']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	foreach($districts as $dist) {
-		$district_marker[$dist['id']] = Report::markerDistrictCount(1, $dist['id'], $_GET['year']);	
+		$district_marker[$dist['id']] = Report::markerDistrictCount(1, $dist['id'], $_GET['year']);
 	}
 	$count_marker = Report::markerDistrictCount(1, $_GET['district'], $_GET['year']);
 	$regions = Region::getRegionList($district['id']);
@@ -161,7 +161,7 @@ function districtBusReport() {
 				} elseif($population_density[$reg['id']] >= 201 ) {
 					$pop_color[$reg['id']] = $colors[0];
 				}
-			
+
 				if($school_ratio[$reg['id']] >= 0 && $school_ratio[$reg['id']] <= 21) {
 					$school_color[$reg['id']] = $colors[3];
 				} elseif($school_ratio[$reg['id']] >= 22 && $school_ratio[$reg['id']] <= 44) {
@@ -171,7 +171,7 @@ function districtBusReport() {
 				} elseif($school_ratio[$reg['id']] >= 65) {
 					$school_color[$reg['id']] = $colors[0];
 				}
-			
+
 				if($kin_ratio[$reg['id']] >= 0 && $kin_ratio[$reg['id']] <= 21) {
 					$kin_color[$reg['id']] = $colors[3];
 				} elseif($kin_ratio[$reg['id']] >= 22 && $kin_ratio[$reg['id']] <= 44) {
@@ -189,9 +189,9 @@ function districtBusReport() {
 
 function districtTrashReport() {
 	$district = District::getDistrict($_GET['district']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	foreach($districts as $dist) {
-		$district_marker[$dist['id']] = Report::markerDistrictCount(10, $dist['id'], $_GET['year']);	
+		$district_marker[$dist['id']] = Report::markerDistrictCount(10, $dist['id'], $_GET['year']);
 	}
 	$count_marker = Report::markerDistrictCount(10, $_GET['district'], $_GET['year']);
 	$regions = Region::getRegionList($district['id']);
@@ -223,9 +223,9 @@ function districtTrashReport() {
 
 function districtSchoolReport() {
 	$district = District::getDistrict($_GET['district']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	foreach($districts as $dist) {
-		$district_marker[$dist['id']] = Report::markerDistrictCount(4, $dist['id'], $_GET['year']);	
+		$district_marker[$dist['id']] = Report::markerDistrictCount(4, $dist['id'], $_GET['year']);
 	}
 	$count_marker = Report::markerDistrictCount(4, $_GET['district'], $_GET['year']);
 	$regions = Region::getRegionList($district['id']);
@@ -257,9 +257,9 @@ function districtSchoolReport() {
 
 function districtHospitalReport() {
 	$district = District::getDistrict($_GET['district']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	foreach($districts as $dist) {
-		$district_marker[$dist['id']] = Report::markerDistrictCount(9, $dist['id'], $_GET['year']);	
+		$district_marker[$dist['id']] = Report::markerDistrictCount(9, $dist['id'], $_GET['year']);
 	}
 	$count_marker = Report::markerDistrictCount(9, $_GET['district'], $_GET['year']);
 	$regions = Region::getRegionList($district['id']);
@@ -291,9 +291,9 @@ function districtHospitalReport() {
 
 function districtKinderReport() {
 	$district = District::getDistrict($_GET['district']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	foreach($districts as $dist) {
-		$district_marker[$dist['id']] = Report::markerDistrictCount(3, $dist['id'], $_GET['year']);	
+		$district_marker[$dist['id']] = Report::markerDistrictCount(3, $dist['id'], $_GET['year']);
 	}
 	$count_marker = Report::markerDistrictCount(3, $_GET['district'], $_GET['year']);
 	$regions = Region::getRegionList($district['id']);
@@ -329,9 +329,9 @@ function districtTypeReport() {
 	$type = Marker::getType($_GET['type']);
 	$info = Info::reportDistrictInfo($_GET['district'], $_GET['year']);
 	$count_marker = Report::markerDistrictCount($_GET['type'], $_GET['district'], $_GET['year']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	foreach($districts as $dist) {
-		$district_marker[$dist['id']] = Report::markerDistrictCount($_GET['type'], $dist['id'], $_GET['year']);	
+		$district_marker[$dist['id']] = Report::markerDistrictCount($_GET['type'], $dist['id'], $_GET['year']);
 	}
 	$colors = array('#8683ab', '#998cb0', '#c6b9ca', '#e7dfdf');
 	foreach($regions as $reg) {
@@ -353,7 +353,7 @@ function districtTypeReport() {
 function regionWellReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -368,7 +368,7 @@ function regionWellReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -389,51 +389,31 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$count_marker = Report::markerRegionCount(2, $_GET['region'], $_GET['year']);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(2, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(2, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionWellReportPdf.php");
 }
@@ -441,7 +421,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionWellReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -460,7 +440,7 @@ function regionWellReport() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -481,52 +461,32 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$count_marker = Report::markerRegionCount(2, $_GET['region'], $_GET['year']);
 	$roads = Road::getRegionRoads($_GET['region']);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(2, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(2, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionWellReport.php");
 }
@@ -534,7 +494,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionSchoolReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -547,7 +507,7 @@ function regionSchoolReportPdf() {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$school_color[$sec['title']] = '#FFFFFF'; 
+				$school_color[$sec['title']] = '#FFFFFF';
 			} else {
 				$school_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['school_ratio']);
 				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
@@ -591,7 +551,7 @@ function regionSchoolReportPdf() {
 function regionSchoolReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -609,7 +569,7 @@ if($info == NULL) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$school_color[$sec['title']] = '#FFFFFF'; 
+				$school_color[$sec['title']] = '#FFFFFF';
 			} else {
 				$school_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['school_ratio']);
 				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
@@ -653,7 +613,7 @@ if($info == NULL) {
 function regionKinderReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -666,43 +626,18 @@ function regionKinderReportPdf() {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
-				$school_color[$sec['title']] = '#FFFFFF';
-				$kin_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
-				$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-					$kin_color[$sec['title']] = $colors[3];
-				} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-					$kin_color[$sec['title']] = $colors[2];
-				} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-					$kin_color[$sec['title']] = $colors[1];
-				} elseif($kin_ratio[$sec['title']] >= 65) {
-					$kin_color[$sec['title']] = $colors[0];
-				}
+				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
 			}
 		} else {
 			if($sectionCheck != $sec['title']) {
 				$sectionCheck = $sec['title'];
 				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-					$school_color[$sec['title']] = '#FFFFFF';
-					$kin_color[$sec['title']] = '#FFFFFF';
+					$population_density[$sec['title']] = -1;
 				} else {
-					$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-			
-					if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-						$kin_color[$sec['title']] = $colors[3];
-					} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-						$kin_color[$sec['title']] = $colors[2];
-					} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-						$kin_color[$sec['title']] = $colors[1];
-					} elseif($kin_ratio[$sec['title']] >= 65) {
-						$kin_color[$sec['title']] = $colors[0];
-					}
+					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
 				}
 			}
 		}
@@ -715,7 +650,7 @@ function regionKinderReportPdf() {
 function regionKinderReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -733,43 +668,18 @@ if($info == NULL) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
-				$school_color[$sec['title']] = '#FFFFFF';
-				$kin_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
-				$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-					$kin_color[$sec['title']] = $colors[3];
-				} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-					$kin_color[$sec['title']] = $colors[2];
-				} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-					$kin_color[$sec['title']] = $colors[1];
-				} elseif($kin_ratio[$sec['title']] >= 65) {
-					$kin_color[$sec['title']] = $colors[0];
-				}
+				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
 			}
 		} else {
 			if($sectionCheck != $sec['title']) {
 				$sectionCheck = $sec['title'];
 				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-					$school_color[$sec['title']] = '#FFFFFF';
-					$kin_color[$sec['title']] = '#FFFFFF';
+					$population_density[$sec['title']] = -1;
 				} else {
-					$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-			
-					if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-						$kin_color[$sec['title']] = $colors[3];
-					} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-						$kin_color[$sec['title']] = $colors[2];
-					} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-						$kin_color[$sec['title']] = $colors[1];
-					} elseif($kin_ratio[$sec['title']] >= 65) {
-						$kin_color[$sec['title']] = $colors[0];
-					}
+					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
 				}
 			}
 		}
@@ -782,7 +692,7 @@ if($info == NULL) {
 function regionTrashReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -797,7 +707,7 @@ function regionTrashReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -818,51 +728,31 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 10);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(10, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(10, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionTrashReportPdf.php");
 }
@@ -870,7 +760,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionTrashReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -889,7 +779,7 @@ if($info == NULL) {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -910,51 +800,31 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 10);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(10, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(10, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionTrashReport.php");
 }
@@ -962,7 +832,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionHospitalReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -977,7 +847,7 @@ function regionHospitalReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -998,51 +868,31 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 9);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(9, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(9, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionHospitalReportPdf.php");
 }
@@ -1050,7 +900,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionHospitalReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1069,7 +919,7 @@ function regionHospitalReport() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1090,52 +940,32 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 9);
 	$roads = Road::getRegionRoads($_GET['region']);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(9, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(9, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionHospitalReport.php");
 }
@@ -1143,7 +973,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionGroundReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1159,7 +989,7 @@ function regionGroundReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1180,53 +1010,33 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$playground = Marker::getType(19);
 	$parking = Marker::getType(20);
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 19);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(19, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(19, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionGroundReportPdf.php");
 }
@@ -1234,7 +1044,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionGroundReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1254,7 +1064,7 @@ function regionGroundReport() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1275,54 +1085,34 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$playground = Marker::getType(19);
 	$parking = Marker::getType(20);
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 19);
 	$roads = Road::getRegionRoads($_GET['region']);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(19, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(19, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionGroundReport.php");
 }
@@ -1330,7 +1120,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionRiskReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1346,7 +1136,7 @@ function regionRiskReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1367,54 +1157,34 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$crime = Marker::getType(6);
 	$police = Marker::getType(5);
 	$crime_count = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 6);
 	$police_count = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 5);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(6, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(6, $reg['id'], $_GET['year']);
 	}
 	$risks = Risks::getRegionRisks($_GET['region']);
 	require(SITE_TEMPLATE . "report/regionRiskReportPdf.php");
@@ -1423,7 +1193,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionRiskReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1443,7 +1213,7 @@ function regionRiskReport() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1464,54 +1234,34 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$crime = Marker::getType(6);
 	$police = Marker::getType(5);
 	$crime_count = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 6);
 	$police_count = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 5);
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(6, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(6, $reg['id'], $_GET['year']);
 	}
 	$roads = Road::getRegionRoads($_GET['region']);
 	$risks = Risks::getRegionRisks($_GET['region']);
@@ -1521,7 +1271,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionBusReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1537,7 +1287,7 @@ function regionBusReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1558,54 +1308,32 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-
-	
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-				}
 			}
 		}
 	}
+}
 	$bus = Marker::getType(1);
 	$light = Marker::getType(7);
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 1);;
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(1, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(1, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionBusReportPdf.php");
 }
@@ -1613,7 +1341,7 @@ foreach( $sectionDensity as $i => $price ) {
 function regionBusReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
@@ -1633,7 +1361,7 @@ function regionBusReport() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1654,44 +1382,24 @@ foreach( $sectionDensity as $i => $price ) {
 		$cls++;
 	}
 }
-	
+
 	foreach($sections as $sec) {
 		if($sectionCheck == NULL) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
 			}
 		} else {
 			if($sectionCheck != $sec['title']) {
 				$sectionCheck = $sec['title'];
 				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
+					$population_density[$sec['title']] = -1;
 				} else {
 					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
 				}
 			}
 		}
@@ -1701,55 +1409,25 @@ foreach( $sectionDensity as $i => $price ) {
 	$roads = Road::getRegionRoads($_GET['region']);
 	$count_marker = Marker::countRegionYearMarkers($_GET['district'], $_GET['region'], 1);;
 	foreach($regions as $reg) {
-		$region_marker[$reg['id']] = Report::markerRegionCount(1, $reg['id'], $_GET['year']);	
+		$region_marker[$reg['id']] = Report::markerRegionCount(1, $reg['id'], $_GET['year']);
 	}
 	require(SITE_TEMPLATE . "report/regionBusReport.php");
 }
 
 function districtProfileReport() {
 	$district = District::getDistrict($_GET['district']);
-	$districts = District::getDistrictList();
+	$districts = [$district];
 	$regions = Region::getRegionList($district['id']);
 	foreach($regions as $reg) {
 		$regionInfo[$reg['id']] = Info::RegionInfo($reg['id'], $_GET['year']);
 		if($regionInfo[$reg['id']] == NULL) {
-			$pop_color[$reg['id']] = '#FFFFFF';
-			$school_color[$reg['id']] = '#FFFFFF';
-			$kin_color[$reg['id']] = '#FFFFFF';
+			$population_density[$reg['id']] = -1;
+			$school_ratio[$reg['id']] = -1;
+			$kin_ratio[$reg['id']] = -1;
 		} else {
-				$population_density[$reg['id']] = ceil($regionInfo[$reg['id']]['population_density']);
-				$school_ratio[$reg['id']] = ceil($regionInfo[$reg['id']]['school_ratio']);
-				$kin_ratio[$reg['id']] = ceil($regionInfo[$reg['id']]['kin_ratio']);
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$reg['id']] >= 0 && $population_density[$reg['id']] <= 50 ) {
-					$pop_color[$reg['id']] = $colors[3];
-				} elseif($population_density[$reg['id']] >= 51 && $population_density[$reg['id']] <= 100 ) {
-					$pop_color[$reg['id']] = $colors[2];
-				} elseif($population_density[$reg['id']] >= 101 && $population_density[$reg['id']] <= 200 ) {
-					$pop_color[$reg['id']] = $colors[1];
-				} elseif($population_density[$reg['id']] >= 201 ) {
-					$pop_color[$reg['id']] = $colors[0];
-				}
-			
-				if($school_ratio[$reg['id']] >= 0 && $school_ratio[$reg['id']] <= 21) {
-					$school_color[$reg['id']] = $colors[3];
-				} elseif($school_ratio[$reg['id']] >= 22 && $school_ratio[$reg['id']] <= 44) {
-					$school_color[$reg['id']] = $colors[2];
-				} elseif($school_ratio[$reg['id']] >= 45 && $school_ratio[$reg['id']] <= 64) {
-					$school_color[$reg['id']] = $colors[1];
-				} elseif($school_ratio[$reg['id']] >= 65) {
-					$school_color[$reg['id']] = $colors[0];
-				}
-			
-				if($kin_ratio[$reg['id']] >= 0 && $kin_ratio[$reg['id']] <= 21) {
-					$kin_color[$reg['id']] = $colors[3];
-				} elseif($kin_ratio[$reg['id']] >= 22 && $kin_ratio[$reg['id']] <= 44) {
-					$kin_color[$reg['id']] = $colors[2];
-				} elseif($kin_ratio[$reg['id']] >= 45 && $kin_ratio[$reg['id']] <= 64) {
-					$kin_color[$reg['id']] = $colors[1];
-				} elseif($kin_ratio[$reg['id']] >= 65) {
-					$kin_color[$reg['id']] = $colors[0];
-				}
+			$population_density[$reg['id']] = ceil($regionInfo[$reg['id']]['population_density']);
+			$school_ratio[$reg['id']] = ceil($regionInfo[$reg['id']]['school_ratio']);
+			$kin_ratio[$reg['id']] = ceil($regionInfo[$reg['id']]['kin_ratio']);
 		}
 	}
 	$bus = Marker::getType(1);
@@ -1769,7 +1447,7 @@ function regionProfileReportPdf() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
 		exit;
@@ -1788,7 +1466,7 @@ function regionProfileReportPdf() {
 	}
 	sort( $sectionDensity );
 	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
+
 $cls = 1;
 $from = $sectionDensity[ 0 ];
 $prices = array_unique( $sectionDensity );
@@ -1810,95 +1488,27 @@ foreach( $sectionDensity as $i => $price ) {
 	}
 }
 
-	foreach($sections as $sec) {
-		if($sectionCheck == NULL) {
+foreach($sections as $sec) {
+	if($sectionCheck == NULL) {
+		$sectionCheck = $sec['title'];
+		$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
+		if($sectionInfo[$sec['title']] == NULL) {
+			$population_density[$sec['title']] = -1;
+		} else {
+			$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
+		}
+	} else {
+		if($sectionCheck != $sec['title']) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
-				$school_color[$sec['title']] = '#FFFFFF';
-				$kin_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-				$school_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['school_ratio']);
-				$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			
-				if($school_ratio[$sec['title']] >= 0 && $school_ratio[$sec['title']] <= 21) {
-					$school_color[$sec['title']] = $colors[3];
-				} elseif($school_ratio[$sec['title']] >= 22 && $school_ratio[$sec['title']] <= 44) {
-					$school_color[$sec['title']] = $colors[2];
-				} elseif($school_ratio[$sec['title']] >= 45 && $school_ratio[$sec['title']] <= 64) {
-					$school_color[$sec['idtitle']] = $colors[1];
-				} elseif($school_ratio[$sec['title']] >= 65) {
-					$school_color[$sec['title']] = $colors[0];
-				}
-			
-				if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-					$kin_color[$sec['title']] = $colors[3];
-				} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-					$kin_color[$sec['title']] = $colors[2];
-				} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-					$kin_color[$sec['title']] = $colors[1];
-				} elseif($kin_ratio[$sec['title']] >= 65) {
-					$kin_color[$sec['title']] = $colors[0];
-				}
-			}
-		} else {
-			if($sectionCheck != $sec['title']) {
-				$sectionCheck = $sec['title'];
-				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
-				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-					$school_color[$sec['title']] = '#FFFFFF';
-					$kin_color[$sec['title']] = '#FFFFFF';
-				} else {
-					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
-					$school_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['school_ratio']);
-					$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			
-					if($school_ratio[$sec['title']] >= 0 && $school_ratio[$sec['title']] <= 21) {
-						$school_color[$sec['title']] = $colors[3];
-					} elseif($school_ratio[$sec['title']] >= 22 && $school_ratio[$sec['title']] <= 44) {
-						$school_color[$sec['title']] = $colors[2];
-					} elseif($school_ratio[$sec['title']] >= 45 && $school_ratio[$sec['title']] <= 64) {
-						$school_color[$sec['idtitle']] = $colors[1];
-					} elseif($school_ratio[$sec['title']] >= 65) {
-						$school_color[$sec['title']] = $colors[0];
-					}
-			
-					if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-						$kin_color[$sec['title']] = $colors[3];
-					} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-						$kin_color[$sec['title']] = $colors[2];
-					} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-						$kin_color[$sec['title']] = $colors[1];
-					} elseif($kin_ratio[$sec['title']] >= 65) {
-						$kin_color[$sec['title']] = $colors[0];
-					}
-				}
 			}
 		}
 	}
+}
 	$bus = Marker::getType(1);
 	$light = Marker::getType(7);
 	$kindergarden = Marker::getType(3);
@@ -1917,7 +1527,7 @@ function regionProfileReport() {
 	$district = District::getDistrict($_GET['district']);
 	$region = Region::getRegion($_GET['region']);
 	$info = Info::RegionInfo($region['id'], $_GET['year']);
-	$regions = Region::getRegionList($district['id']);
+	$regions = [$region];
 	if($info == NULL) {
 		require(SITE_TEMPLATE . "report/reportNotExist.php");
 		exit;
@@ -1938,114 +1548,33 @@ function regionProfileReport() {
 		$sectionDensity[] = $secDenRows['population']/$secDenRows['area_length'];
 	}
 	sort( $sectionDensity );
-	$breaks = Jenks::getBreaks( $sectionDensity, 4);
-	
-$cls = 1;
-$from = $sectionDensity[ 0 ];
-$prices = array_unique( $sectionDensity );
-sort( $sectionDensity );
+	$breaks = [1, 2, 3, 4, 5, 6, 7, 800, 900]; //Jenks::getBreaks( $sectionDensity, 4);
 
-foreach( $sectionDensity as $i => $price ) {
-	if( $price >= $breaks[ $cls ] ) {
-		$count = 0;
-		foreach( $sectionDensity as $p ) {
-			if( $p >= $from && $p <= $price ) {
-				$count++;
-			}
-		}
-		if( isset( $sectionDensity[ $i + 1 ] ) ) {
-			$from = $sectionDensity[ $i + 1 ];
-		}
-
-		$cls++;
-	}
-}
-	
 	foreach($sections as $sec) {
 		if($sectionCheck == NULL) {
 			$sectionCheck = $sec['title'];
 			$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 			if($sectionInfo[$sec['title']] == NULL) {
-				$pop_color[$sec['title']] = '#FFFFFF';
-				$school_color[$sec['title']] = '#FFFFFF';
-				$kin_color[$sec['title']] = '#FFFFFF';
+				$population_density[$sec['title']] = -1;
+				$school_ratio[$sec['title']] = -1;
+				$kin_ratio[$sec['title']] = -1;
 			} else {
 				$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
 				$school_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['school_ratio']);
 				$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-				$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			
-				if($school_ratio[$sec['title']] >= 0 && $school_ratio[$sec['title']] <= 21) {
-					$school_color[$sec['title']] = $colors[3];
-				} elseif($school_ratio[$sec['title']] >= 22 && $school_ratio[$sec['title']] <= 44) {
-					$school_color[$sec['title']] = $colors[2];
-				} elseif($school_ratio[$sec['title']] >= 45 && $school_ratio[$sec['title']] <= 64) {
-					$school_color[$sec['idtitle']] = $colors[1];
-				} elseif($school_ratio[$sec['title']] >= 65) {
-					$school_color[$sec['title']] = $colors[0];
-				}
-			
-				if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-					$kin_color[$sec['title']] = $colors[3];
-				} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-					$kin_color[$sec['title']] = $colors[2];
-				} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-					$kin_color[$sec['title']] = $colors[1];
-				} elseif($kin_ratio[$sec['title']] >= 65) {
-					$kin_color[$sec['title']] = $colors[0];
-				}
 			}
 		} else {
 			if($sectionCheck != $sec['title']) {
 				$sectionCheck = $sec['title'];
 				$sectionInfo[$sec['title']] = Info::SectionInfo($_GET['region'], $_GET['district'], $sec['title'], $_GET['year']);
 				if($sectionInfo[$sec['title']] == NULL) {
-					$pop_color[$sec['title']] = '#FFFFFF';
-					$school_color[$sec['title']] = '#FFFFFF';
-					$kin_color[$sec['title']] = '#FFFFFF';
+					$population_density[$sec['title']] = -1;
+					$school_ratio[$sec['title']] = -1;
+					$kin_ratio[$sec['title']] = -1;
 				} else {
 					$population_density[$sec['title']] = $sectionInfo[$sec['title']]['population']/$sectionInfo[$sec['title']]['area_length'];
 					$school_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['school_ratio']);
 					$kin_ratio[$sec['title']] = ceil($sectionInfo[$sec['title']]['kin_ratio']);
-					$colors = array('#730601', '#a84600', '#e48801', '#ffdc9c');
-				if($population_density[$sec['title']] <= $breaks[2] ) {
-					$pop_color[$sec['title']] = $colors[3];
-				} elseif($population_density[$sec['title']] >= ($breaks[2]+0.0000001) && $population_density[$sec['title']] <= $breaks[3] ) {
-					$pop_color[$sec['title']] = $colors[2];
-				} elseif($population_density[$sec['title']] >= ($breaks[3]+0.0000001) && $population_density[$sec['title']] <= $from ) {
-					$pop_color[$sec['title']] = $colors[1];
-				} elseif($population_density[$sec['title']] >= ($from+0.0000001) ) {
-					$pop_color[$sec['title']] = $colors[0];
-				}
-			
-					if($school_ratio[$sec['title']] >= 0 && $school_ratio[$sec['title']] <= 21) {
-						$school_color[$sec['title']] = $colors[3];
-					} elseif($school_ratio[$sec['title']] >= 22 && $school_ratio[$sec['title']] <= 44) {
-						$school_color[$sec['title']] = $colors[2];
-					} elseif($school_ratio[$sec['title']] >= 45 && $school_ratio[$sec['title']] <= 64) {
-						$school_color[$sec['idtitle']] = $colors[1];
-					} elseif($school_ratio[$sec['title']] >= 65) {
-						$school_color[$sec['title']] = $colors[0];
-					}
-			
-					if($kin_ratio[$sec['title']] >= 0 && $kin_ratio[$sec['title']] <= 21) {
-						$kin_color[$sec['title']] = $colors[3];
-					} elseif($kin_ratio[$sec['title']] >= 22 && $kin_ratio[$sec['title']] <= 44) {
-						$kin_color[$sec['title']] = $colors[2];
-					} elseif($kin_ratio[$sec['title']] >= 45 && $kin_ratio[$sec['title']] <= 64) {
-						$kin_color[$sec['title']] = $colors[1];
-					} elseif($kin_ratio[$sec['title']] >= 65) {
-						$kin_color[$sec['title']] = $colors[0];
-					}
 				}
 			}
 		}
@@ -2106,7 +1635,7 @@ function reportDistrictListBack() {
 
 function reportView() {
 	if (isset($_POST['selectType'])) {
-		header( "Location: markers.php?action=districtAdd&type=".$_POST['type_id'] );	
+		header( "Location: markers.php?action=districtAdd&type=".$_POST['type_id'] );
 	}
 	$years = Year::getYearList();
 	$districts = District::getDistrictList();

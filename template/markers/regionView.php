@@ -118,28 +118,28 @@ include(SITE_TEMPLATE. "header.php");
 						<div class="colorBox" style="background: #ffdc9c;">
 						</div>
 						<div class="colorBoxNumber">
-							0% - 25%
+							0% - 10%
 						</div>
 					</div>
 					<div class="colorBoxRow">
 						<div class="colorBox" style="background: #e48801;">
 						</div>
 						<div class="colorBoxNumber">
-							26% - 50%
+							11% - 20%
 						</div>
 					</div>
 					<div class="colorBoxRow">
 						<div class="colorBox" style="background: #a84600;">
 						</div>
 						<div class="colorBoxNumber">
-							51% - 75%
+							21% - 30%
 						</div>
 					</div>
 					<div class="colorBoxRow">
 						<div class="colorBox" style="background: #730601;">
 						</div>
 						<div class="colorBoxNumber">
-							76% - 100%
+							> 30%
 						</div>
 					</div>
 				</div>
@@ -151,28 +151,28 @@ include(SITE_TEMPLATE. "header.php");
 						<div class="colorBox" style="background: #ffdc9c;">
 						</div>
 						<div class="colorBoxNumber">
-							0% - 25%
+							0% - 10%
 						</div>
 					</div>
 					<div class="colorBoxRow">
 						<div class="colorBox" style="background: #e48801;">
 						</div>
 						<div class="colorBoxNumber">
-							26% - 50%
+							11% - 20%
 						</div>
 					</div>
 					<div class="colorBoxRow">
 						<div class="colorBox" style="background: #a84600;">
 						</div>
 						<div class="colorBoxNumber">
-							51% - 75%
+							21% - 30%
 						</div>
 					</div>
 					<div class="colorBoxRow">
 						<div class="colorBox" style="background: #730601;">
 						</div>
 						<div class="colorBoxNumber">
-							76% - 100%
+							> 30%
 						</div>
 					</div>
 				</div>
@@ -180,70 +180,51 @@ include(SITE_TEMPLATE. "header.php");
 		</div>
 	</div>
 
-<script>
-var map;
-var zoomlevel;
-var infoWindow;
-var contentString;
-var circles1 = [];
-var circles11 = [];
-var circles21 = [];
-var circles31 = [];
-var circles2 = [];
-var circles12 = [];
-var circles22 = [];
-var circles32 = [];
+<script type="text/javascript" src="<?php echo ROOT_FOLDER; ?>/js/jsts.min.js"></script>
+<script type="text/javascript" src="<?php echo ROOT_FOLDER; ?>/js/shared-map.js"></script>
+<script type="text/javascript">
+var inregions = [];
+var regions = [];
 
+var flids = [
+<?php
+	foreach($results['regions'] as $rg) :
+		foreach($floods[$rg['id']] as $fld) {
+?>
+	<?php echo $fld['id']; ?>,
+<?php
+		}
+	endforeach;
+?>
+-1];
+flids.pop();
 
-var kmzMobinet;
-var kmzGmobile;
-var kmzTopnet;
-var kmzUnivision;
-var kmzMagicnet;
-var kmzNiislel;
-var kmzZhut;
+var pgids = [
+<?php
+	foreach($results['regions'] as $rg) :
+		foreach($pls[$rg['id']] as $pl) {
+?>
+<?php echo $pl['id']; ?>,
+<?php
+		}
+	endforeach;
+?>
+-1];
+pgids.pop();
 
-<?php foreach($results['types'] as $mk_type) : ?>
-	var points<?php echo $mk_type['id']; ?> = [];
+var rdids = [
+<?php foreach($roads as $rd) :	?>
+<?php echo $rd['id']; ?>,
 <?php endforeach; ?>
-<?php foreach($results['regions'] as $rg) : ?>
-	var distArea<?php echo $rg['id']; ?> = '';
-	var regionArea<?php echo $rg['id']; ?>;
-	var regionTitle<?php echo $rg['id']; ?>;
-<?php
-	foreach($sections[$rg['id']] as $sec) {
-?>
-	var sectionArea<?php echo $sec['id']; ?>;
-	var popArea<?php echo $sec['id'];  ?> = '';
-	var sectionCoord<?php echo $sec['id']; ?> = [];
-<?php
-	}
-	foreach($floods[$rg['id']] as $fld) {
-?>
-	var floodCoord<?php echo $fld['id']; ?> = [];
-	var floodArea<?php echo $fld['id']; ?> = [];
-<?php
-	} 
-	foreach($pls[$rg['id']] as $pl) {
-?>
-	var plCoord<?php echo $pl['id']; ?> = [];
-	var plArea<?php echo $pl['id']; ?> = [];
-<?php
-	}
-	endforeach; 
-?>
-
-<?php foreach($roads as $rd) { ?>
-	var rdCoord<?php echo $rd['id']; ?> = [];
-	var rdArea<?php echo $rd['id']; ?> = [];
-<?php } ?>
-
+-1];
+rdids.pop();
 
 function initialize() {
 	var mapOptions = {
 		zoom: <?php echo $results['district']['zoom']; ?>,
 		center: new google.maps.LatLng(<?php echo $results['district']['position'] ?>),
 		panControl: false,
+		streetViewControl: false,
 		maxZoom: 19,
 		minZoom: 9,
 		mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -266,23 +247,24 @@ styles: [
 	};
 	map = new google.maps.Map(document.getElementById('map-district'),
       mapOptions);
-	  
-	google.maps.event.addListener(map, 'zoom_changed', function() {
-		
-    	<?php foreach($results['types'] as $mk_type) : ?>
-			if(points<?php echo $mk_type['id']; ?> !== 'undefined' && points<?php echo $mk_type['id']; ?>.length > 0) {
-				removeMarker(<?php echo $mk_type['id']; ?>, <?php echo $results['district']['id']; ?>);
-				addMarker(<?php echo $mk_type['id']; ?>, <?php echo $results['district']['id']; ?>);	
-			}
-		<?php endforeach; ?>
-		
+	map.mapTypes.set("OSM", new google.maps.ImageMapType({
+		getTileUrl: function(coord, zoom) {
+			return "//tile.openstreetmap.org/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
+		},
+		tileSize: new google.maps.Size(256, 256),
+		name: "OpenStreetMap",
+		maxZoom: 18
+	}));
+	infoWindow = new google.maps.InfoWindow({});
+
+  <?php foreach($results['regions'] as $dist) : ?>
+	  inregions.push(<?php echo json_encode($sections[$dist['id']] ); ?>);
+	<?php endforeach; ?>
+
 		<?php foreach($results['regions'] as $reg) : ?>
-    		removeRegionTitle(<?php echo $reg['id']; ?>);
-			addRegionTitle(<?php echo $reg['id']; ?>, <?php echo $reg['center'] ?>, <?php echo '"'.$reg['image'].'"'; ?>);
+			addRegionTitle(<?php echo $reg['title']; ?>, <?php echo $reg['center'] ?>, <?php echo '"'.$reg['image'].'"'; ?>);
 		<?php endforeach; ?>
-		
-  	});
-  	
+
   	$(".color-checker").click(function(){
 		var colorType = $(this).find(".color-checkbox").attr("data");
 		if($(this).attr("data") == "checked") {
@@ -291,37 +273,16 @@ styles: [
 			$(this).removeAttr("data");
 			if($(this).find(".color-checkbox").attr("data") == "pop-density") {
 				$("#popDensityColor").hide();
-				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						removeDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
-					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						removeRegionColor(<?php echo $sec['id']; ?>);
-					<?php endforeach; ?>
-				<?php endforeach; ?>
+				removeRegionColor();
 			}
 			if($(this).find(".color-checkbox").attr("data") == "kin-density") {
 				$("#kinDensityColor").hide();
-				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						removeDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
-					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						removeRegionColor(<?php echo $sec['id']; ?>);
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			} 
+				removeRegionColor();
+			}
 			if($(this).find(".color-checkbox").attr("data") == "school-density") {
 				$("#schoolDensityColor").hide();
-				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						removeDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
-					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						removeRegionColor(<?php echo $sec['id']; ?>);
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			}	
+				removeRegionColor();
+			}
 		} else {
 			$(".color-checker").each(function() {
 				$(this).removeAttr("data");
@@ -336,110 +297,66 @@ styles: [
 			$(this).attr("data", "checked");
 			if($(this).find(".color-checkbox").attr("data") == "pop-density") {
 				$("#popDensityColor").show();
+				styleByRegion = {
 				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						if(distArea<?php echo $dist['id']; ?> != '') {
-							removeDistrictBackground(<?php echo $dist['id']; ?>);
-						}
-						addDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
 					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						if(<?php echo 'popArea'.$sec['id']; ?> != '') {
-							removeRegionColor(<?php echo $sec['id']; ?>);
-						}
-						<?php if($pop_district[$dist['id']][$sec['id']] != NULL) { ?>
-						addRegionColor(<?php echo $sec['id']; ?>, '<?php echo $pop_district[$dist['id']][$sec['id']]; ?>');
-						<?php } ?>
+<?php if(isset($pop_district[$dist['id']][$sec['id']]) ) { ?>'<?php echo $sec['id']; ?>':'<?php echo $pop_district[$dist['id']][$sec['id']]; ?>',<?php } ?>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
+				'x': 0
+			  };
+				setRegionColor('x', 1);
 			}
 			if($(this).find(".color-checkbox").attr("data") == "kin-density") {
 				$("#kinDensityColor").show();
+				styleByRegion = {
 				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						if(distArea<?php echo $dist['id']; ?> != '') {
-							removeDistrictBackground(<?php echo $dist['id']; ?>);
-						}
-						addDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
 					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						if(<?php echo 'popArea'.$sec['id']; ?> != '') {
-							removeRegionColor(<?php echo $sec['id']; ?>);
-						}
-						<?php if($pop_district[$dist['id']][$sec['id']] != NULL) { ?>
-						addRegionColor(<?php echo $sec['id']; ?>, '<?php echo $kin_district[$dist['id']][$sec['id']]; ?>');
-						<?php } ?>
+<?php if(isset($kin_district[$dist['id']][$sec['id']])) { ?>'<?php echo $sec['id']; ?>':'<?php echo $kin_district[$dist['id']][$sec['id']]; ?>',<?php } ?>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
-			} 
+				'x': 0
+			  };
+				setRegionColor('x', 1);
+			}
 			if($(this).find(".color-checkbox").attr("data") == "school-density") {
 				$("#schoolDensityColor").show();
+				styleByRegion = {
 				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						if(distArea<?php echo $dist['id']; ?> != '') {
-							removeDistrictBackground(<?php echo $dist['id']; ?>);
-						}
-						addDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
 					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						if(<?php echo 'popArea'.$sec['id']; ?> != '') {
-							removeRegionColor(<?php echo $sec['id']; ?>);
-						}
-						<?php if($pop_district[$dist['id']][$sec['id']] != NULL) { ?>
-							addRegionColor(<?php echo $sec['id']; ?>, '<?php echo $school_district[$dist['id']][$sec['id']]; ?>');
-						<?php } ?>
+<?php if(isset($school_district[$dist['id']][$sec['id']])) { ?>'<?php echo $sec['id']; ?>':'<?php echo $school_district[$dist['id']][$sec['id']]; ?>',<?php } ?>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
-			}	
+				'x': 0
+			  };
+				setRegionColor('x', 1);
+			}
 		}
 	});
 
+<?php function ider($o) { return $o['id']; } ?>
+addRegions(<?php echo json_encode( array_map("ider", $results['regions'])  ) ?>);
+
 <?php foreach($results['regions'] as $region) : ?>
-	addRegion(<?php echo $results['district']['id'] ?>, <?php echo $region['id']; ?>, '<?php echo MAIN_FOLDER.''.$region['image']; ?>');
-	addRegionTitle(<?php echo $region['id']; ?>, <?php echo $region['center'] ?>, <?php echo '"'.$region['image'].'"'; ?>);
+	addRegionTitle(<?php echo $region['title']; ?>, <?php echo $region['center'] ?>, <?php echo '"'.$region['image'].'"'; ?>);
 <?php endforeach; ?>
 
-	$(".marker-checker").click(function(){
-		var markerType = $(this).find(".marker-checkbox").attr("data");
-		if($(this).attr("data") == "checked") {
-			$(this).find(".marker-checkbox").show();
-			$(this).find(".marker-checked").hide();
-			$(this).removeAttr("data");
+	$(".marker-row").click(function(e){
+		var box = e.currentTarget;
+		var markerType = $(box).find(".marker-checkbox").attr("data");
+		if($(box).attr("data") == "checked") {
+			$(box).find(".marker-checkbox").show();
+			$(box).find(".marker-checked").hide();
+			$(box).removeAttr("data");
 			if(markerType == "sectionline") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($sections[$rg['id']] as $sec) {
-				?>
-					removeSection(<?php echo $sec['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
+				removeSections();
 			} else if(markerType == "flood-pol") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($floods[$rg['id']] as $fld) {
-				?>
-					removeFlood(<?php echo $fld['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
+				removeFloods();
 			} else if(markerType == "pl-pol") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($pls[$rg['id']] as $pl) {
-				?>
-					removePlayground(<?php echo $pl['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
-			} else if(markerType == "road-pol") { 
+				removePlaygrounds();
+			} else if(markerType == "road-pol") {
+				removeRoads();
 				map.setOptions({styles: roadStylesRemove});
-				<?php foreach($roads as $rd) :	?>
-					removeRoad(<?php echo $rd['id']; ?>);
-				<?php endforeach; ?>
 			} else if(markerType == "cableline") {
 					removeMobinet();
 			} else if(markerType == "gmobileline") {
@@ -459,46 +376,20 @@ styles: [
 			} else {
 				$(".infobox-type"+markerType).empty();
 				$(".markerbox-type"+markerType).empty();
-				removeMarker(markerType, <?php echo $results['district']['id']; ?>);	
+				removeMarker(markerType, <?php echo $results['district']['id']; ?>);
 			}
 		} else {
-			$(this).find(".marker-checkbox").hide();
-			$(this).find(".marker-checked").show();
-			$(this).attr("data", "checked");
+			$(box).find(".marker-checkbox").hide();
+			$(box).find(".marker-checked").show();
+			$(box).attr("data", "checked");
 			if(markerType == "sectionline") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($sections[$rg['id']] as $sec) {
-				?>
-					addSection(<?php echo $sec['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
+				addSections();
 			} else if(markerType == "flood-pol") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($floods[$rg['id']] as $fld) {
-				?>
-					addFlood(<?php echo $fld['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
-			} else if(markerType == "pl-pol") { 
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($pls[$rg['id']] as $pl) {
-				?>
-					addPlayground(<?php echo $pl['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
-			} else if(markerType == "road-pol") { 
-				<?php foreach($roads as $rd) :	?>
-					addRoad(<?php echo $rd['id']; ?>, <?php echo $rd['width']; ?>);
-				<?php endforeach; ?>
+				addFloods();
+			} else if(markerType == "pl-pol") {
+				addPlaygrounds();
+			} else if(markerType == "road-pol") {
+				addRoads();
 				map.setOptions({styles: roadStyles});
 			} else if(markerType == "cableline") {
 					addMobinet();
@@ -517,7 +408,7 @@ styles: [
 			} else if(markerType == "zhutline") {
 					addZhut();
 			} else {
-				$.ajax({ 
+				$.ajax({
 					type: "post",
 					data: { type: markerType, district: <?php echo $results['district']['id']; ?> },
 					url:"infoBoxRegion.php",
@@ -525,7 +416,7 @@ styles: [
 						$(".infobox-type"+markerType).html(result);
 					}
 				});
-				$.ajax({ 
+				$.ajax({
 					type: "post",
 					data: { type: markerType, district: <?php echo $results['district']['id']; ?> },
 					url:"getDistrictMarkerInfo.php",
@@ -535,10 +426,10 @@ styles: [
 				});
 				$(".mainfobox-title").show();
 				addMarker(markerType, <?php echo $results['district']['id']; ?>);
-			}		
+			}
 		}
 	});
-	
+
 	$(".marker-checker-walk").click(function(){
 		var circleType = $(this).find(".marker-checkbox").attr("data");
 		if($(this).attr("data") == "checked") {
@@ -550,61 +441,13 @@ styles: [
 			$(this).find(".marker-checkbox").hide();
 			$(this).find(".marker-checked").show();
 			$(this).attr("data", "checked");
-			addWalk(circleType, <?php echo $results['district']['id']; ?>);	
+			addWalk(circleType, <?php echo $results['district']['id']; ?>);
 		}
 	});
 
-var roadStylesRemove = [
-  {
-    featureType: 'road.arterial',
-    elementType: 'geometry.fill'
-  },{
-    featureType: 'road.highway',
-    elementType: 'geometry.fill'
-  }
-];
-
-var roadStyles = [
-  {
-    featureType: 'road.arterial',
-    elementType: 'geometry.fill',
-    stylers: [
-      { color: '#ffde00' }
-    ]
-  },{
-    featureType: 'road.highway',
-    elementType: 'geometry.fill',
-    stylers: [
-      { color: '#ffde00' }
-    ]
-  }
-];
-
-
-
-var styles1 = [
-  {
-    featureType: 'landscape',
-    elementType: 'geometry.fill',
-  },{
-    featureType: 'poi',
-    elementType: 'geometry.fill',
-  }
-];
-	
-	$("#terrainSelect").click(function(){
-		map.setOptions({mapTypeId: google.maps.MapTypeId.TERRAIN});
-	});
-	$("#roadMapSelect").click(function(){
-		map.setOptions({mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styles1});
-	});
-	$("#hybridSelect").click(function(){
-		map.setOptions({mapTypeId: google.maps.MapTypeId.HYBRID});
-	});
-	
 	$(".rs-link").click(function(){
 		fitBoundary(<?php echo $results['district']['id'] ?>, $(this).attr("data"));
-		$.ajax({ 
+		$.ajax({
 			type: "post",
 			data: { region_id: $(this).attr("data") },
 			url:"regionInfo.php",
@@ -615,457 +458,195 @@ var styles1 = [
 	});
 }
 
+function clickMarker(marker, markerdata) {
+	var markerInfoTitle = markerdata[0];
+	var markerInfoPhone = markerdata[1];
+	var markerInfoEmail = markerdata[2];
+	var markerInfoDesc = markerdata[3];
+	google.maps.event.addListener(marker, 'click', function(event){
+		infoWindow.close();
+		var contentString = '<div id="infoWindow" style="height: 120px; width: 210px;">';
+		if(markerInfoTitle) {
+			contentString += '<div class="markerInfoTitle">'+markerInfoTitle+'</div>';
+		}
+		if(markerInfoPhone) {
+			contentString += '<div class="contactInfoTitle"><span>Утас: </span>'+markerInfoPhone+'</div>';
+		}
+		if(markerInfoEmail) {
+			contentString += '<div class="contactInfoTitle"><span>И-мэйл: </span>'+markerInfoEmail+'</div>'
+		}
+		if(markerInfoDesc) {
+			contentString += '<div class="additionalInfoTitle"><h6>Нэмэлт тайлбар</h6><p>'+markerInfoDesc+'</p></div>'
+		}
+		if(!markerInfoTitle && !markerInfoPhone && !markerInfoEmail && !markerInfoDesc) {
+			contentString += '<div class="noInfoTitle">Мэдээлэл алга байна.</div>';
+		}
+		contentString += '</div>';
+
+		infoWindow.setContent(contentString);
+		infoWindow.open(map, marker);
+	});
+}
+
 function addMarker(typeid, district) {
+	if (markers[typeid] && markers[typeid].length) {
+		for (var m = 0; m < markers[typeid].length; m++) {
+			markers[typeid][m].setMap(map);
+		}
+	}
 	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=getInfoMarkers&type='+typeid+'&district='+district+'', function(point){
-		if(point.coordinate.length == 0) {
+		if(!point.coordinate || !point.coordinate.length) {
 			return;
-		} else {
-			if(typeid != 7) {
-			zoomlevel = map.getZoom();
+		}
+		var zoomlevel = map.getZoom();
+		var iconImg;
+
+		if(typeid != 7) {
 			var levelmultiplier = zoomlevel-9;
-			var iconImg = {
+			iconImg = {
 				url: point.image,
-   				size: new google.maps.Size(levelmultiplier*4, levelmultiplier*4),
-    			origin: new google.maps.Point(0,0),
-    			anchor: new google.maps.Point(levelmultiplier*4/2,levelmultiplier*4),
+   			size: new google.maps.Size(levelmultiplier*4, levelmultiplier*4),
+    		origin: new google.maps.Point(0,0),
+    		anchor: new google.maps.Point(levelmultiplier*4/2,levelmultiplier*4),
 				scaledSize: new google.maps.Size(levelmultiplier*4, levelmultiplier*4)
-			}
+			};
 			for(var k = 0; k < point.coordinate.length; k++) {
-				if(point.info[k][0] != null) {
-					var markerInfoTitle = point.info[k][0];
-				} else {
-					var markerInfoTitle = null;
-				}
-				if(point.info[k][1] != null) {
-					var markerInfoPhone = point.info[k][1];
-				} else {
-					var markerInfoPhone = null;
-				}
-				if(point.info[k][2] != null) {
-					var markerInfoEmail = point.info[k][2];
-				} else {
-					var markerInfoEmail = null;
-				}
-				if(point.info[k][3] != null) {
-					var markerInfoDesc = point.info[k][3];
-				} else {
-					var markerInfoDesc = null;
-				}
-				window['points'+typeid][k] = new google.maps.Marker({
-    				position: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    				map: map,
+				var markerPt = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
+				var marker = new google.maps.Marker({
+    			position: markerPt,
+    			map: map,
 					icon: iconImg
-  				});
-				window['points'+typeid][k].setMap(map);
-				window['points'+typeid][k].set('markertitle', markerInfoTitle);
-				window['points'+typeid][k].set('markerphone', markerInfoPhone);
-				window['points'+typeid][k].set('markeremail', markerInfoEmail);
-				window['points'+typeid][k].set('markerdesc', markerInfoDesc);
-				google.maps.event.addListener(window['points'+typeid][k], 'click', function(event){
-					var markertitle = this.get('markertitle');
-					var markerphone = this.get('markerphone');
-					var markeremail = this.get('markeremail');
-					var markerdesc = this.get('markerdesc');
-					contentString = '<div id="infoWindow" style="height: 120px; width: 210px;">';
-					if(markertitle != null) {
-						contentString += '<div class="markerInfoTitle">'+markertitle+'</div>';
-					}
-					if(markerphone != null) {
-						contentString += '<div class="contactInfoTitle"><span>Утас: </span>'+markerphone+'</div>';
-					}
-					if(markeremail != null) {
-						contentString += '<div class="contactInfoTitle"><span>И-мэйл: </span>'+markeremail+'</div>'
-					}
-					if(markerdesc != null) {
-						contentString += '<div class="additionalInfoTitle"><h6>Нэмэлт тайлбар</h6><p>'+markerdesc+'</p></div>'
-					}
-					if(markertitle === null && markerphone === null && markeremail === null && markerdesc === null) {
-						contentString += '<div class="noInfoTitle">Мэдээлэл алга байна.</div>';
-					}
-					contentString += '</div>';
-	
-					infoWindow = new google.maps.InfoWindow({
-      					content: contentString,
-						position: new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())
-  					});
-					infoWindow.open(map, window['points'+typeid][k]);
-				});
+  			});
+				if (!markers[typeid]) {
+					markers[typeid] = [];
+				}
+				markers[typeid].push(marker);
+				clickMarker(marker, point.info[k]);
 			}
-			} else {
-			zoomlevel = map.getZoom();
+		} else {
 			if(zoomlevel < 14) {
 				var subtract = zoomlevel - 1;
 			} else {
 				var subtract = 11;
 			}
 			var levelmultiplier = zoomlevel - subtract;
-			var iconImg = {
+			iconImg = {
 				url: point.image,
-   				size: new google.maps.Size(levelmultiplier, levelmultiplier),
-    			origin: new google.maps.Point(0,0),
-    			anchor: new google.maps.Point(levelmultiplier,levelmultiplier),
+   			size: new google.maps.Size(levelmultiplier, levelmultiplier),
+    		origin: new google.maps.Point(0,0),
+    		anchor: new google.maps.Point(levelmultiplier,levelmultiplier),
 				scaledSize: new google.maps.Size(levelmultiplier, levelmultiplier)
+			};
+			if (!markers[typeid]) {
+				markers[typeid] = [];
 			}
 			for(var k = 0; k < point.coordinate.length; k++) {
-				window['points'+typeid][k] = new google.maps.Marker({
-    				position: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    				map: map,
+			  markers[typeid].push(new google.maps.Marker({
+    		  position: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
+    			map: map,
 					icon: iconImg
-  				});
-				window['points'+typeid][k].setMap(map);
-			}
+  			}));
 			}
 		}
 	});
 }
 
-function addFlood(floodId) {
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=risksBorder&id='+floodId, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			window['floodCoord'+floodId] = [];
-			for(var k = 0; k < point.coordinate.length; k++) {
-				window['floodCoord'+floodId][k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
+function setRegionColor(section, color) {
+	if (color) {
+		strokeStyle.fillOpacity = 1;
+	}
+	if (!regions.length) {
+		// convert to GeoJSON and add to Google Map if not done already
+		for (var ir = 0; ir < inregions.length; ir++) {
+			var rr = inregions[ir];
+			for (var r = 0; r < rr.length; r++) {
+				var region = rr[r];
+				var incoord = region.coordinate.split(')(');
+				var coordinates = [];
+				for (var c = 0; c < incoord.length; c++) {
+					incoord[c] = incoord[c].replace('(','').replace(')','').split(', ');
+					incoord[c][0] *= 1;
+					incoord[c][1] *= 1;
+					if (isNaN(incoord[c][0]) || isNaN(incoord[c][1])) {
+						continue;
+					}
+					coordinates.push([incoord[c][1], incoord[c][0]]);
+				}
+				if (!coordinates.length) {
+					continue;
+				}
+				coordinates.push(coordinates[0]);
+
+				regions.push({
+					id: region.id,
+					type: 'Feature',
+					properties: {
+						id: region.id,
+		  			title: region.title,
+			  		district_id: region.district_id,
+					  region_id: region.region_id,
+					  area: region.area
+					},
+					geometry: {
+						type: 'Polygon',
+					  coordinates: [coordinates]
+					}
+				});
 			}
-			window['floodArea'+floodId] = new google.maps.Polygon({
-    			path: window['floodCoord'+floodId],
-    			 strokeColor: '#900202',
-    			 strokeOpacity: 1,
-    			 strokeWeight: 2,
-    			 fillColor: '#d40202',
-    			 fillOpacity: 0.6
-  			});
-			window['floodArea'+floodId].setMap(map);
 		}
+
+		map.data.setStyle({
+			fillOpacity: strokeStyle.fillOpacity,
+			strokeColor: strokeStyle.color,
+			strokeOpacity: strokeStyle.opacity,
+			strokeWeight: strokeStyle.weight
+		});
+		map.data.addGeoJson({
+			type: 'FeatureCollection',
+			features: regions
+		});
+	}
+
+	styleByRegion[section] = color;
+	map.data.setStyle(function(feature) {
+		return {
+			strokeColor: strokeStyle.color,
+			strokeOpacity: strokeStyle.opacity,
+			strokeWeight: strokeStyle.weight,
+			fillColor: styleByRegion[feature.getId()] || '#fff',
+			// fill this region with the set color, unless no color exists or filling is off
+			fillOpacity: ((strokeStyle.fillOpacity && styleByRegion[feature.getId()]) ? 0.6 : 0 )
+		};
 	});
-}
-
-function addMobinet() {
-	kmzMobinet = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/mobinet.kmz');
-	kmzMobinet.setMap(map);
-}
-
-function removeMobinet() {
-	kmzMobinet.setMap(null);
-}
-
-function addGmobile() {
-	kmzGmobile = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/gmobile.kmz');
-	kmzGmobile.setMap(map);
-}
-
-function removeGmobile() {
-	kmzGmobile.setMap(null);
-}
-
-function addTopnet() {
-	kmzTopnet = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/topnet.kmz');
-	kmzTopnet.setMap(map);
-}
-
-function removeTopnet() {
-	kmzTopnet.setMap(null);
-}
-
-function addUnivision() {
-	kmzUnivision = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/univision.kmz');
-	kmzUnivision.setMap(map);
-}
-
-function removeUnivision() {
-	kmzUnivision.setMap(null);
-}
-
-function addMagicnet() {
-	kmzMagicnet = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/magicnet.kmz');
-	kmzMagicnet.setMap(map);
-}
-
-function removeMagicnet() {
-	kmzMagicnet.setMap(null);
-}
-
-function addNiislel() {
-	kmzNiislel = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/niislel.kmz');
-	kmzNiislel.setMap(map);
-}
-
-function removeNiislel() {
-	kmzNiislel.setMap(null);
-}
-
-function addZhut() {
-	kmzZhut = new google.maps.KmlLayer('http://manaikhoroo.ub.gov.mn/webroot/zhut.kmz');
-	kmzZhut.setMap(map);
-}
-
-function removeZhut() {
-	kmzZhut.setMap(null);
-}
-
-function addRoad(plId, widthRoad) {
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=roadBorder&id='+plId, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			window['rdCoord'+plId] = [];
-			for(var k = 0; k < point.coordinate.length; k++) {
-				window['rdCoord'+plId][k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-			}
-			window['rdArea'+plId] = new google.maps.Polyline({
-    			 path: window['rdCoord'+plId],
-    			 geodesic: true,
-    			 strokeColor: '#fbdc00',
-    			 strokeOpacity: 1.0,
-    			 strokeWeight: widthRoad
-  			});
-			window['rdArea'+plId].setMap(map);
-		}
-	});
-}
-
-function addPlayground(plId) {
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=playgroundBorder&id='+plId, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			window['plCoord'+plId] = [];
-			for(var k = 0; k < point.coordinate.length; k++) {
-				window['plCoord'+plId][k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-			}
-			window['plArea'+plId] = new google.maps.Polygon({
-    			path: window['plCoord'+plId],
-    			 strokeColor: '#4a9e32',
-    			 strokeOpacity: 1,
-    			 strokeWeight: 2,
-    			 fillColor: '#a7d392',
-    			 fillOpacity: 0.6
-  			});
-			window['plArea'+plId].setMap(map);
-		}
-	});
-}
-
-function removeFlood(flood) {
-	window['floodArea'+flood].setMap(null);
-	window['floodCoord'+flood] = [];
-}
-
-function removePlayground(plId) {
-	window['plArea'+plId].setMap(null);
-	window['plCoord'+plId] = [];
-}
-
-function removeRoad(rdId) {
-	window['rdArea'+rdId].setMap(null);
-	window['rdCoord'+rdId] = [];
-}
-
-function addSection(section) {
-	$.getJSON('<?php echo SITE_URL; ?>marker.php?page=sectionBorder&section='+section, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			window['sectionCoord'+section] = [];
-			for(var k = 0; k < point.coordinate.length; k++) {
-				window['sectionCoord'+section][k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-			}
-			window['sectionArea'+section] = new google.maps.Polygon({
-    			path: window['sectionCoord'+section],
-    			 strokeColor: '#7dd303',
-    			 strokeOpacity: 1,
-    			 strokeWeight: 2,
-    			 fillColor: "#7dd303",
-    			 fillOpacity: 0
-  			});
-			window['sectionArea'+section].setMap(map);
-		}
-	});
-}
-
-function removeRegionColor(section) {
-	if(window['popArea'+section] != '') {
-		window['popArea'+section].setMap(null);	
-	}
-	window['popArea'+section] = '';
-}
-
-function addRegionColor(section, color) {
-	$.getJSON('<?php echo SITE_URL; ?>marker.php?page=sectionBorder&section='+section, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			var popCoord = [];
-			for(var k = 0; k < point.coordinate.length; k++) {
-				popCoord[k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-			}
-			window['popArea'+section] = new google.maps.Polygon({
-				paths: popCoord,
-				strokeColor: '#FFFFFF',
-				strokeOpacity: 0,
-				strokeWeight: 0,
-				fillColor: color,
-				fillOpacity: 0.6
-			});
-			window['popArea'+section].setMap(map);
-		}
-	});
-}
-
-function removeSection(section) {
-	window['sectionArea'+section].setMap(null);
-	window['sectionCoord'+section] = [];
-}
-
-function removeMarker(typeid, district) {
-	for(var k = 0; k < window['points'+typeid].length; k++) {
-		window['points'+typeid][k].setMap(null);
-	}
-	window['points'+typeid] = [];
-}
-
-function removeWalk(type, district) {
-	if(type == "walk-bus") {
-		var walkid = 1; 
-	} else {
-		var walkid = 2;
-	}
-	for(var k = 0; k < window['circles'+walkid].length; k++) {
-		window['circles'+walkid][k].setMap(null);
-	}
-	for(var k = 0; k < window['circles1'+walkid].length; k++) {
-		window['circles1'+walkid][k].setMap(null);
-	}
-	for(var k = 0; k < window['circles2'+walkid].length; k++) {
-		window['circles2'+walkid][k].setMap(null);
-	}
-	for(var k = 0; k < window['circles3'+walkid].length; k++) {
-		window['circles3'+walkid][k].setMap(null);
-	}
-	window['circles'+walkid] = [];
-	window['circles1'+walkid] = [];
-	window['circles2'+walkid] = [];
-	window['circles3'+walkid] = [];
 }
 
 function addWalk(type, district) {
 	if(type == "walk-bus") {
-		var walkid = 1; 
+		var walkid = 1;
 	} else {
 		var walkid = 2;
 	}
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=getMarkers&type='+walkid+'&district='+district+'', function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			for(var k = 0; k < point.coordinate.length; k++) {
-				if(walkid == 1) {
-					window['circles'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#00371d",
-						radius: 100,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});	
-					window['circles1'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#33bb7a",
-						radius: 200,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});	
-					window['circles2'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#76f3b7",
-						radius: 300,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});	
-					window['circles3'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#d7ffec",
-						radius: 400,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});	
-				} else {
-					window['circles'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#013167",
-						radius: 100,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});
-					window['circles1'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#3c82d1",
-						radius: 200,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});
-					window['circles2'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#7fbbff",
-						radius: 300,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});
-					window['circles3'+walkid][k] = new google.maps.Circle({
-    					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
-    					map: map,
-						fillColor: "#d2e7ff",
-						radius: 400,
-						strokeWeight: 0,
-						fillOpacity: 0.1
-  					});
-				}
-				window['circles'+walkid][k].setMap(map);
-			}
-		}
+	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=getMarkers&type='+walkid+'&district='+district+'', function(point) {
+		processWalkCircles(point, walkid);
 	});
 }
 
 function fitBoundary(district, region) {
 	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=regionBorder&region='+region, function(point){
-		if(point.coordinate.length == 0) {
+		if(!point.coordinate || !point.coordinate.length) {
 			return;
 		} else {
-			var regionCoord = [];
-			var khorooBounds = [];
 			var khorooBounds = new google.maps.LatLngBounds();
 			for(var k = 0; k < point.coordinate.length; k++) {
-				regionCoord[k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
 				khorooBounds.extend(new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]));
 			}
-			window['regionArea'+region] = new google.maps.Polygon({
-				paths: regionCoord,
-				strokeColor: '#000000',
-				strokeOpacity: 0,
-				strokeWeight: 2,
-				fillColor: '#FFFFFF',
-				fillOpacity: 0
-			});
 			map.fitBounds(khorooBounds);
-			window['regionArea'+region].setMap(map);
 		}
 	});
 }
 
-function removeRegionTitle(regionid) {
-	window['regionTitle'+regionid].setMap(null);
-	window['regionTitle'+regionid] = [];
-}
-
 function addRegionTitle(regionid, distlat, distlng, image) {
-	zoomlevel = map.getZoom();
+	var zoomlevel = map.getZoom();
 	if(zoomlevel < 14) {
 		var levelmultiplier = 6;
 	} else {
@@ -1073,99 +654,49 @@ function addRegionTitle(regionid, distlat, distlng, image) {
 	}
 	var iconImg = {
 		url: '<?php echo MAIN_FOLDER; ?>'+image,
-   		size: new google.maps.Size(levelmultiplier*6, levelmultiplier*2),
-    	origin: new google.maps.Point(0,0),
-    	anchor: new google.maps.Point(levelmultiplier*3,levelmultiplier),
+   	size: new google.maps.Size(levelmultiplier*6, levelmultiplier*2),
+    origin: new google.maps.Point(0,0),
+    anchor: new google.maps.Point(levelmultiplier*3,levelmultiplier),
 		scaledSize: new google.maps.Size(levelmultiplier*6, levelmultiplier*2)
-	}
-	window['regionTitle'+regionid] = new google.maps.Marker({
-    	position: new google.maps.LatLng(distlat, distlng),
-    	map: map,
+	};
+	var title = new google.maps.Marker({
+    position: new google.maps.LatLng(distlat, distlng),
+    map: map,
 		icon: iconImg
-  	});
-	window['regionTitle'+regionid].setMap(map);
-}
-
-function addRegion(district, region, image) {
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=regionBorder&region='+region, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			var regionCoord = [];
-			var polBounds = new google.maps.LatLngBounds();
-			for(var k = 0; k < point.coordinate.length; k++) {
-				regionCoord[k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-				polBounds.extend(regionCoord[k]);
-			}
-			window['regionArea'+region] = new google.maps.Polygon({
-				paths: regionCoord,
-				strokeColor: '#f38924',
-				strokeOpacity: 1,
-				strokeWeight: 3,
-				fillColor: '#FFFFFF',
-				fillOpacity: 0
-			});
-			window['regionArea'+region].setMap(map);
+  });
+	google.maps.event.addListener(title, 'click', function(event){
+		if (!isNaN(1 * regionid)) {
+  		$($(".dsb-content .rs-link")[1 * regionid - 1]).trigger('click');
 		}
 	});
 }
 
-function removeDistrictBackground(regId) {
-	window['distArea'+regId].setMap(null);
-	window['distArea'+regId] = '';
-}
-
-function addDistrictBackground(regId) {
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=regionBorder&region='+regId, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			var regionCoord = [];
-			var polBounds = new google.maps.LatLngBounds();
-			for(var k = 0; k < point.coordinate.length; k++) {
-				regionCoord[k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-				polBounds.extend(regionCoord[k]);
+function addRegions(regionids) {
+	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=regionBorder&regions='+regionids.join(','), function(regions){
+		for (var r = 0; r < regions.length; r++) {
+			var point = regions[r];
+			if(!point.coordinate || !point.coordinate.length) {
+				continue;
+			} else {
+				var regionCoord = [];
+				var polBounds = new google.maps.LatLngBounds();
+				for(var k = 0; k < point.coordinate.length; k++) {
+					regionCoord[k] = new google.maps.LatLng(point.coordinate[k][0] * 1, point.coordinate[k][1] * 1);
+					polBounds.extend(regionCoord[k]);
+				}
+				new google.maps.Polygon({
+					paths: regionCoord,
+					strokeColor: '#f38924',
+					strokeOpacity: 1,
+					strokeWeight: 3,
+					fillColor: '#FFFFFF',
+					fillOpacity: 0,
+					map: map,
+					clickable: false
+				});
 			}
-			window['distArea'+regId] = new google.maps.Polygon({
-				paths: regionCoord,
-				strokeColor: '#f38924',
-				strokeOpacity: 0,
-				strokeWeight: 0,
-				fillColor: '#ffdc9c',
-				fillOpacity: 0.6
-			});
-			window['distArea'+regId].setMap(map);
 		}
 	});
-}
-
-function getCenterOfPolygon(polygon){
-	var PI=22/7
-	var X=0;
-	var Y=0;
-	var Z=0;
-	polygon.getPath().forEach(function (vertex, inex) {
-		lat1=vertex.lat();
-		lon1=vertex.lng();
-		lat1 = lat1 * PI/180
-		lon1 = lon1 * PI/180
-		X += Math.cos(lat1) * Math.cos(lon1)
-		Y += Math.cos(lat1) * Math.sin(lon1)
-		Z += Math.sin(lat1)
-	})
-	Lon = Math.atan2(Y, X)
-	Hyp = Math.sqrt(X * X + Y * Y)
-	Lat = Math.atan2(Z, Hyp)
-	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
-	return new google.maps.LatLng(Lat,Lon);
-}
-
-function loadScript() {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDK9WxrpaRxS1yhssT0ylOjzF6EFRGxZYI&callback=initialize";
-  document.body.appendChild(script);
 }
 
 window.onload = loadScript();
@@ -1345,17 +876,17 @@ $(document).ready(function() {
 		<?php foreach($results['regions'] as $region) : ?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php if($results['region_infos'][$region['id']]['population'] != NULL) { echo $results['region_infos'][$region['id']]['population']; } else { echo 0; } ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php if($results['region_infos'][$region['id']]['population'] != NULL) { echo $results['region_infos'][$region['id']]['population']; } else { echo 0; } ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -1363,9 +894,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -1393,7 +924,7 @@ $(document).ready(function() {
 						align: 'center',
 						font: "9pt 'Arial'"
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -1413,9 +944,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="population_tooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -1433,7 +964,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#population-chart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -1442,7 +973,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/>Хүн амын тоо<br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {
@@ -1466,7 +997,7 @@ $(document).ready(function () {
 	$(".choice-btn").click(function() {
 		var type = $(this).attr("data");
 		$("#district-choices").empty();
-		$.ajax({ 
+		$.ajax({
 			type: "post",
 			url:"get_regionChart.php?type=" + type +'&district='+<?php echo $_GET['district']; ?>,
 			success:function (result) {
@@ -1638,119 +1169,119 @@ $(document).ready(function () {
 	<div class="row-rgtable row-value">
 		<?php
 			if($results['district_info'] != NULL) {
-				echo $results['district_info']['population'];	
-			}  
-		?>
-	</div>
-	<div class="row-rgtable row-value">
-		<?php
-			if($results['district_info'] != NULL) { 
-				echo $results['district_info']['household']; 
+				echo $results['district_info']['population'];
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
 		<?php
-			if($results['district_info'] != NULL) { 
-				echo round($results['district_info']['household_average'], 2); 
-			}
-		?>
-	</div>
-	<div class="row-rgtable row-value">
-		<?php 
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['area_length']); 
+				echo $results['district_info']['household'];
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['population_density'], 2); 
+				echo round($results['district_info']['household_average'], 2);
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
+			if($results['district_info'] != NULL) {
+				echo round($results['district_info']['area_length']);
+			}
+		?>
+	</div>
+	<div class="row-rgtable row-value">
+		<?php
+			if($results['district_info'] != NULL) {
+				echo round($results['district_info']['population_density'], 2);
+			}
+		?>
+	</div>
+	<div class="row-rgtable row-value">
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['bus_density'], 2).'%'; 
+			echo round($results['district_info']['bus_density'], 2).'%';
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo $districtMarkerCount['well']['COUNT(*)']; 
+			echo $districtMarkerCount['well']['COUNT(*)'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['well_density'], 2).'%'; 
+				echo round($results['district_info']['well_density'], 2).'%';
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['well_ratio'], 2); 
+				echo round($results['district_info']['well_ratio'], 2);
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo $districtMarkerCount['trash']['COUNT(*)']; 
+				echo $districtMarkerCount['trash']['COUNT(*)'];
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['risk_ratio'], 2).'%'; 
+				echo round($results['district_info']['risk_ratio'], 2).'%';
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo $districtMarkerCount['hospital']['COUNT(*)']; 
+			echo $districtMarkerCount['hospital']['COUNT(*)'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['hospital_ratio'], 2); 
+			echo round($results['district_info']['hospital_ratio'], 2);
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo $results['district_info']['kin_num']; 
+			echo $results['district_info']['kin_num'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['kin_ratio'], 2).'%'; 
+			echo round($results['district_info']['kin_ratio'], 2).'%';
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
 			echo $results['district_info']['school_num'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['school_ratio'], 2).'%'; 
+			echo round($results['district_info']['school_ratio'], 2).'%';
 		}
 		?>
 	</div>
@@ -1793,7 +1324,7 @@ $(document).ready(function () {
 							<option value>Сонгоно уу</option>
 							<?php
 								$n = 0;
-								foreach($indicators as $k=>$v) : 
+								foreach($indicators as $k=>$v) :
 								$n = $n + 1;
 							?>
 								<option value="<?php echo $k; ?>"><?php echo $n.'. '.$v; ?></option>
@@ -1815,7 +1346,7 @@ $(document).ready(function () {
 				</form>
 			</div>
 			<div id="YearStatInfoBox">
-				
+
 			</div>
 		</div>
 	</div>

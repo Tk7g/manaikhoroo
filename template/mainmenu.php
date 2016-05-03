@@ -1,11 +1,18 @@
 <?php
 require_once(realpath(dirname(__FILE__))."/../classes/Menu.class.php");
 require_once(realpath(dirname(__FILE__))."/../classes/User.class.php");
-include(ADMIN_TEMPLATE."session_check.php"); 
 session_start();
+//include(ADMIN_TEMPLATE."session_check.php"); 
 ?>
 <div id="mainmenu" >
-	<ul class="nav navbar-nav nav-fixed-top" role="navigation">
+	<nav class="navbar navbar-inverse">
+	  <div class="container-fluid">
+		  <div class="navbar-header">
+		      <a class="navbar-brand" href="#">
+		        <img src="<?php echo ROOT_FOLDER; ?>/img/logo.png" />
+		      </a>
+		</div>
+	<ul class="nav navbar-nav">
 		<?php 
 			$components = array(
 				1 => 'index.php',
@@ -29,7 +36,7 @@ session_start();
 			<?php 
 				if($subs != NULL) { 
 			?>
-			<ul class="dropdown-list" role="menu">
+			<ul class="dropdown-menu">
 				<?php 
 					foreach($subs as $sub) :
 				?>
@@ -48,24 +55,19 @@ session_start();
 		<?php if($_SESSION != NULL) {?>
 		<li id="dropdown-list1">
 			<a href="#">
-				<i><img src="/webroot/icons/user-icon.png"/></i>
+				<i><img src="<?php echo ROOT_FOLDER;?>/icons/user-icon.png"/></i>
 				<?php echo $_SESSION['login']['username']; ?>
 			</a>
-			<ul class="dropdown-list1" role="menu">
+			<ul class="dropdown-menu">
 				<li><a href="user.php?page=passChange"><i class="glyphicon glyphicon-refresh"></i> Нууц үг солих</a></li>
 				<li><a href="user.php?page=logout"><i class="glyphicon glyphicon-off"></i> Гарах</a></li>
 			</ul>
 		</li>
 		<?php } ?>
-                <li id="dropdown-list2">
-		<a href="http://manaikhoroo.ub.gov.mn/en/index.php">
-			<i><img src="/webroot/menu/151_20150330195911.png"></i>ENGLISH
-		</a>
-		
-		</li>
 	</ul>
 </div>
-
+</nav>
+</div>
 <script>
 
 $(document).ready(function(){

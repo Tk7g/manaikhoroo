@@ -192,46 +192,12 @@ var circles12 = [];
 var circles22 = [];
 var circles32 = [];
 
-<?php foreach($results['types'] as $mk_type) : ?>
-	var points<?php echo $mk_type['id']; ?> = [];
-<?php endforeach; ?>
-<?php foreach($results['regions'] as $rg) : ?>
-	var distArea<?php echo $rg['id']; ?> = '';
-	var regionArea<?php echo $rg['id']; ?>;
-	var regionTitle<?php echo $rg['id']; ?>;
-<?php
-	foreach($sections[$rg['id']] as $sec) {
-?>
-	var sectionArea<?php echo $sec['id']; ?>;
-	var popArea<?php echo $sec['id'];  ?> = '';
-	var sectionCoord<?php echo $sec['id']; ?> = [];
-<?php
-	} 
-	foreach($floods[$rg['id']] as $fld) {
-?>
-	var floodCoord<?php echo $fld['id']; ?> = [];
-	var floodArea<?php echo $fld['id']; ?> = [];
-<?php
-	}
-	foreach($pls[$rg['id']] as $pl) {
-?>
-	var plCoord<?php echo $pl['id']; ?> = [];
-	var plArea<?php echo $pl['id']; ?> = [];
-<?php
-	}
-	endforeach; 
-?>
-
-<?php foreach($roads as $rd) { ?>
-	var rdCoord<?php echo $rd['id']; ?> = [];
-	var rdArea<?php echo $rd['id']; ?> = [];
-<?php } ?>
-
 function initialize() {
 	var mapOptions = {
 		zoom: <?php echo $current_region['zoom']; ?>,
 		center: new google.maps.LatLng(<?php echo $current_region['center'] ?>),
 		panControl: false,
+		streetViewControl: false,
 		maxZoom: 19,
 		minZoom: 9,
 		mapTypeId: google.maps.MapTypeId.HYBRID,
@@ -253,24 +219,18 @@ styles: [
 ]
 	};
 	map = new google.maps.Map(document.getElementById('map-district'),
-      mapOptions);  
-	  
-	google.maps.event.addListener(map, 'zoom_changed', function() {
-		
+      mapOptions);
+
     	<?php foreach($results['types'] as $mk_type) : ?>
 			if(points<?php echo $mk_type['id']; ?> !== 'undefined' && points<?php echo $mk_type['id']; ?>.length > 0) {
-				removeMarker(<?php echo $mk_type['id']; ?>, <?php echo $results['district']['id']; ?>);
-				addMarker(<?php echo $mk_type['id']; ?>, <?php echo $results['district']['id']; ?>);	
+				addMarker(<?php echo $mk_type['id']; ?>, <?php echo $results['district']['id']; ?>);
 			}
 		<?php endforeach; ?>
-		
+
 		<?php foreach($results['regions'] as $reg) : ?>
-    		removeRegionTitle(<?php echo $reg['id']; ?>);
 			addRegionTitle(<?php echo $reg['id']; ?>, <?php echo $reg['center'] ?>, <?php echo '"'.$reg['image'].'"'; ?>);
 		<?php endforeach; ?>
-		
-  	});
-	
+
 	$(".color-checker").click(function(){
 		var colorType = $(this).find(".color-checkbox").attr("data");
 		if($(this).attr("data") == "checked") {
@@ -279,37 +239,13 @@ styles: [
 			$(this).removeAttr("data");
 			if($(this).find(".color-checkbox").attr("data") == "pop-density") {
 				$("#popDensityColor").hide();
-				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						removeDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
-					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						removeRegionColor(<?php echo $sec['id']; ?>);
-					<?php endforeach; ?>
-				<?php endforeach; ?>
 			}
 			if($(this).find(".color-checkbox").attr("data") == "kin-density") {
 				$("#kinDensityColor").hide();
-				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						removeDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
-					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						removeRegionColor(<?php echo $sec['id']; ?>);
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			} 
+			}
 			if($(this).find(".color-checkbox").attr("data") == "school-density") {
 				$("#schoolDensityColor").hide();
-				<?php foreach($results['regions'] as $dist) : ?>
-					<?php if($sections[$dist['id']] == NULL) { ?>
-						removeDistrictBackground(<?php echo $dist['id']; ?>);
-					<?php } ?>
-					<?php foreach($sections[$dist['id']] as $sec) : ?>
-						removeRegionColor(<?php echo $sec['id']; ?>);
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			}	
+			}
 		} else {
 			$(".color-checker").each(function() {
 				$(this).removeAttr("data");
@@ -327,13 +263,13 @@ styles: [
 				<?php foreach($results['regions'] as $dist) : ?>
 					<?php if($sections[$dist['id']] == NULL) { ?>
 						if(distArea<?php echo $dist['id']; ?> != '') {
-							removeDistrictBackground(<?php echo $dist['id']; ?>);
+
 						}
 						addDistrictBackground(<?php echo $dist['id']; ?>);
 					<?php } ?>
 					<?php foreach($sections[$dist['id']] as $sec) : ?>
 						if(<?php echo 'popArea'.$sec['id']; ?> != '') {
-							removeRegionColor(<?php echo $sec['id']; ?>);
+
 						}
 						<?php if($pop_district[$dist['id']][$sec['id']] != NULL) { ?>
 						addRegionColor(<?php echo $sec['id']; ?>, '<?php echo $pop_district[$dist['id']][$sec['id']]; ?>');
@@ -346,134 +282,108 @@ styles: [
 				<?php foreach($results['regions'] as $dist) : ?>
 					<?php if($sections[$dist['id']] == NULL) { ?>
 						if(distArea<?php echo $dist['id']; ?> != '') {
-							removeDistrictBackground(<?php echo $dist['id']; ?>);
+
 						}
 						addDistrictBackground(<?php echo $dist['id']; ?>);
 					<?php } ?>
 					<?php foreach($sections[$dist['id']] as $sec) : ?>
 						if(<?php echo 'popArea'.$sec['id']; ?> != '') {
-							removeRegionColor(<?php echo $sec['id']; ?>);
+
 						}
 						<?php if($pop_district[$dist['id']][$sec['id']] != NULL) { ?>
 						addRegionColor(<?php echo $sec['id']; ?>, '<?php echo $kin_district[$dist['id']][$sec['id']]; ?>');
 						<?php } ?>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
-			} 
+			}
 			if($(this).find(".color-checkbox").attr("data") == "school-density") {
 				$("#schoolDensityColor").show();
 				<?php foreach($results['regions'] as $dist) : ?>
 					<?php if($sections[$dist['id']] == NULL) { ?>
 						if(distArea<?php echo $dist['id']; ?> != '') {
-							removeDistrictBackground(<?php echo $dist['id']; ?>);
+
 						}
 						addDistrictBackground(<?php echo $dist['id']; ?>);
 					<?php } ?>
 					<?php foreach($sections[$dist['id']] as $sec) : ?>
 						if(<?php echo 'popArea'.$sec['id']; ?> != '') {
-							removeRegionColor(<?php echo $sec['id']; ?>);
+
 						}
 						<?php if($pop_district[$dist['id']][$sec['id']] != NULL) { ?>
 							addRegionColor(<?php echo $sec['id']; ?>, '<?php echo $school_district[$dist['id']][$sec['id']]; ?>');
 						<?php } ?>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
-			}	
+			}
 		}
 	});
-	
+
 <?php foreach($results['regions'] as $region) : ?>
 	addRegion(<?php echo $results['district']['id'] ?>, <?php echo $region['id']; ?>, '<?php echo MAIN_FOLDER.''.$region['image']; ?>');
 	addRegionTitle(<?php echo $region['id']; ?>, <?php echo $region['center'] ?>, <?php echo '"'.$region['image'].'"'; ?>);
 <?php endforeach; ?>
 
-	$(".marker-checker").click(function(){
-		var markerType = $(this).find(".marker-checkbox").attr("data");
-		if($(this).attr("data") == "checked") {
-			$(this).find(".marker-checkbox").show();
-			$(this).find(".marker-checked").hide();
-			$(this).removeAttr("data");
+	$(".marker-row").click(function(e){
+		var box = e.currentTarget;
+		var markerType = $(box).find(".marker-checkbox").attr("data");
+		if($(box).attr("data") == "checked") {
+			$(box).find(".marker-checkbox").show();
+			$(box).find(".marker-checked").hide();
+			$(box).removeAttr("data");
 			if(markerType == "sectionline") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($sections[$rg['id']] as $sec) {
-				?>
-					removeSection(<?php echo $sec['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
+
 			} else if(markerType == "flood-pol") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($floods[$rg['id']] as $fld) {
-				?>
-					removeFlood(<?php echo $fld['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
+
 			} else if(markerType == "pl-pol") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
-						foreach($pls[$rg['id']] as $pl) {
-				?>
-					removePlayground(<?php echo $pl['id']; ?>);
-				<?php
-						} 
-					endforeach; 
-				?>
-			} else if(markerType == "road-pol") { 
+
+			} else if(markerType == "road-pol") {
 				map.setOptions({styles: roadStylesRemove});
-				<?php foreach($roads as $rd) :	?>
-					removeRoad(<?php echo $rd['id']; ?>);
-				<?php endforeach; ?>
+
 			} else {
 				$(".infobox-type"+markerType).empty();
 				$(".markerbox-type"+markerType).empty();
-				removeMarker(markerType, <?php echo $results['district']['id']; ?>);	
 			}
 		} else {
-			$(this).find(".marker-checkbox").hide();
-			$(this).find(".marker-checked").show();
-			$(this).attr("data", "checked");
+			$(box).find(".marker-checkbox").hide();
+			$(box).find(".marker-checked").show();
+			$(box).attr("data", "checked");
 			if(markerType == "sectionline") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
+				<?php
+					foreach($results['regions'] as $rg) :
 						foreach($sections[$rg['id']] as $sec) {
 				?>
 					addSection(<?php echo $sec['id']; ?>);
 				<?php
-						} 
-					endforeach; 
+						}
+					endforeach;
 				?>
 			} else if(markerType == "flood-pol") {
-				<?php 
-					foreach($results['regions'] as $rg) : 
+				<?php
+					foreach($results['regions'] as $rg) :
 						foreach($floods[$rg['id']] as $fld) {
 				?>
 					addFlood(<?php echo $fld['id']; ?>);
 				<?php
-						} 
-					endforeach; 
+						}
+					endforeach;
 				?>
-			} else if(markerType == "pl-pol") { 
-				<?php 
-					foreach($results['regions'] as $rg) : 
+			} else if(markerType == "pl-pol") {
+				<?php
+					foreach($results['regions'] as $rg) :
 						foreach($pls[$rg['id']] as $pl) {
 				?>
 					addPlayground(<?php echo $pl['id']; ?>);
 				<?php
-						} 
-					endforeach; 
+						}
+					endforeach;
 				?>
-			} else if(markerType == "road-pol") { 
+			} else if(markerType == "road-pol") {
 				map.setOptions({styles: roadStyles});
 				<?php foreach($roads as $rd) :	?>
 					addRoad(<?php echo $rd['id']; ?>, <?php echo $rd['width']; ?>);
 				<?php endforeach; ?>
 			} else {
-				$.ajax({ 
+				$.ajax({
 					type: "post",
 					data: { type: markerType, district: <?php echo $results['district']['id']; ?> },
 					url:"infoBoxRegion.php",
@@ -481,7 +391,7 @@ styles: [
 						$(".infobox-type"+markerType).html(result);
 					}
 				});
-				$.ajax({ 
+				$.ajax({
 					type: "post",
 					data: { type: markerType, district: <?php echo $results['district']['id']; ?> },
 					url:"getDistrictMarkerInfo.php",
@@ -491,25 +401,24 @@ styles: [
 				});
 				$(".mainfobox-title").show();
 				addMarker(markerType, <?php echo $results['district']['id']; ?>);
-			}		
+			}
 		}
 	});
-	
+
 	$(".marker-checker-walk").click(function(){
 		var circleType = $(this).find(".marker-checkbox").attr("data");
 		if($(this).attr("data") == "checked") {
 			$(this).find(".marker-checkbox").show();
 			$(this).find(".marker-checked").hide();
 			$(this).removeAttr("data");
-			removeWalk(circleType, <?php echo $results['district']['id']; ?>);
 		} else {
 			$(this).find(".marker-checkbox").hide();
 			$(this).find(".marker-checked").show();
 			$(this).attr("data", "checked");
-			addWalk(circleType, <?php echo $results['district']['id']; ?>);	
+			addWalk(circleType, <?php echo $results['district']['id']; ?>);
 		}
 	});
-	
+
 var roadStylesRemove = [
   {
     featureType: 'road.arterial',
@@ -545,7 +454,7 @@ var styles1 = [
     elementType: 'geometry.fill',
   }
 ];
-	
+
 	$("#terrainSelect").click(function(){
 		map.setOptions({mapTypeId: google.maps.MapTypeId.TERRAIN});
 	});
@@ -555,10 +464,10 @@ var styles1 = [
 	$("#hybridSelect").click(function(){
 		map.setOptions({mapTypeId: google.maps.MapTypeId.HYBRID, styles: styles1});
 	});
-	
+
 	$(".rs-link").click(function(){
 		fitBoundary(<?php echo $results['district']['id'] ?>, $(this).attr("data"));
-		$.ajax({ 
+		$.ajax({
 			type: "post",
 			data: { region_id: $(this).attr("data") },
 			url:"regionInfo.php",
@@ -588,11 +497,6 @@ function addRoad(plId, widthRoad) {
 			window['rdArea'+plId].setMap(map);
 		}
 	});
-}
-
-function removeRoad(rdId) {
-	window['rdArea'+rdId].setMap(null);
-	window['rdCoord'+rdId] = [];
 }
 
 function addMarker(typeid, district) {
@@ -644,13 +548,6 @@ function addMarker(typeid, district) {
 			}
 		}
 	});
-}
-
-function removeRegionColor(section) {
-	if(window['popArea'+section] != '') {
-		window['popArea'+section].setMap(null);	
-	}
-	window['popArea'+section] = '';
 }
 
 function addRegionColor(section, color) {
@@ -741,55 +638,9 @@ function addPlayground(plId) {
 	});
 }
 
-function removePlayground(plId) {
-	window['plArea'+plId].setMap(null);
-	window['plCoord'+plId] = [];
-}
-
-function removeSection(section) {
-	window['sectionArea'+section].setMap(null);
-	window['sectionCoord'+section] = [];
-}
-
-function removeFlood(flood) {
-	window['floodArea'+flood].setMap(null);
-	window['floodCoord'+flood] = [];
-}
-
-function removeMarker(typeid, district) {
-	for(var k = 0; k < window['points'+typeid].length; k++) {
-		window['points'+typeid][k].setMap(null);
-	}
-	window['points'+typeid] = [];
-}
-
-function removeWalk(type, district) {
-	if(type == "walk-bus") {
-		var walkid = 1; 
-	} else {
-		var walkid = 2;
-	}
-	for(var k = 0; k < window['circles'+walkid].length; k++) {
-		window['circles'+walkid][k].setMap(null);
-	}
-	for(var k = 0; k < window['circles1'+walkid].length; k++) {
-		window['circles1'+walkid][k].setMap(null);
-	}
-	for(var k = 0; k < window['circles2'+walkid].length; k++) {
-		window['circles2'+walkid][k].setMap(null);
-	}
-	for(var k = 0; k < window['circles3'+walkid].length; k++) {
-		window['circles3'+walkid][k].setMap(null);
-	}
-	window['circles'+walkid] = [];
-	window['circles1'+walkid] = [];
-	window['circles2'+walkid] = [];
-	window['circles3'+walkid] = [];
-}
-
 function addWalk(type, district) {
 	if(type == "walk-bus") {
-		var walkid = 1; 
+		var walkid = 1;
 	} else {
 		var walkid = 2;
 	}
@@ -806,7 +657,7 @@ function addWalk(type, district) {
 						radius: 100,
 						strokeWeight: 0,
 						fillOpacity: 0.1
-  					});	
+  					});
 					window['circles1'+walkid][k] = new google.maps.Circle({
     					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
     					map: map,
@@ -814,7 +665,7 @@ function addWalk(type, district) {
 						radius: 200,
 						strokeWeight: 0,
 						fillOpacity: 0.1
-  					});	
+  					});
 					window['circles2'+walkid][k] = new google.maps.Circle({
     					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
     					map: map,
@@ -822,7 +673,7 @@ function addWalk(type, district) {
 						radius: 300,
 						strokeWeight: 0,
 						fillOpacity: 0.1
-  					});	
+  					});
 					window['circles3'+walkid][k] = new google.maps.Circle({
     					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
     					map: map,
@@ -830,7 +681,7 @@ function addWalk(type, district) {
 						radius: 400,
 						strokeWeight: 0,
 						fillOpacity: 0.1
-  					});	
+  					});
 				} else {
 					window['circles'+walkid][k] = new google.maps.Circle({
     					center: new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]),
@@ -897,11 +748,6 @@ function fitBoundary(district, region) {
 	});
 }
 
-function removeRegionTitle(regionid) {
-	window['regionTitle'+regionid].setMap(null);
-	window['regionTitle'+regionid] = [];
-}
-
 function addRegionTitle(regionid, distlat, distlng, image) {
 	zoomlevel = map.getZoom();
 	if(zoomlevel < 14) {
@@ -946,11 +792,6 @@ function addRegion(district, region, image) {
 	});
 }
 
-function removeDistrictBackground(regId) {
-	window['distArea'+regId].setMap(null);
-	window['distArea'+regId] = '';
-}
-
 function addDistrictBackground(regId) {
 	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=regionBorder&region='+regId, function(point){
 		if(point.coordinate.length == 0) {
@@ -993,7 +834,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 
@@ -1181,17 +1022,17 @@ $(document).ready(function() {
 		<?php foreach($results['regions'] as $region) : ?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php if($results['region_infos'][$region['id']]['population'] != NULL) { echo $results['region_infos'][$region['id']]['population']; } else { echo 0; } ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php if($results['region_infos'][$region['id']]['population'] != NULL) { echo $results['region_infos'][$region['id']]['population']; } else { echo 0; } ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -1199,9 +1040,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -1229,7 +1070,7 @@ $(document).ready(function() {
 						align: 'center',
 						font: "9pt 'Arial'"
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -1249,9 +1090,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="population_tooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -1269,7 +1110,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#population-chart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -1278,7 +1119,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/>Хүн амын тоо<br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {
@@ -1302,7 +1143,7 @@ $(document).ready(function () {
 	$(".choice-btn").click(function() {
 		var type = $(this).attr("data");
 		$("#district-choices").empty();
-		$.ajax({ 
+		$.ajax({
 			type: "post",
 			url:"get_regionChart.php?type=" + type +'&district='+<?php echo $_GET['district']; ?>,
 			success:function (result) {
@@ -1473,119 +1314,119 @@ $(document).ready(function () {
 	<div class="row-rgtable row-value">
 		<?php
 			if($results['district_info'] != NULL) {
-				echo $results['district_info']['population'];	
-			}  
-		?>
-	</div>
-	<div class="row-rgtable row-value">
-		<?php
-			if($results['district_info'] != NULL) { 
-				echo $results['district_info']['household']; 
+				echo $results['district_info']['population'];
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
 		<?php
-			if($results['district_info'] != NULL) { 
-				echo round($results['district_info']['household_average'], 2); 
-			}
-		?>
-	</div>
-	<div class="row-rgtable row-value">
-		<?php 
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['area_length']); 
+				echo $results['district_info']['household'];
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['population_density'], 2); 
+				echo round($results['district_info']['household_average'], 2);
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
+			if($results['district_info'] != NULL) {
+				echo round($results['district_info']['area_length']);
+			}
+		?>
+	</div>
+	<div class="row-rgtable row-value">
+		<?php
+			if($results['district_info'] != NULL) {
+				echo round($results['district_info']['population_density'], 2);
+			}
+		?>
+	</div>
+	<div class="row-rgtable row-value">
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['bus_density'], 2); 
+			echo round($results['district_info']['bus_density'], 2);
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo $results['district_info']['well_num']; 
+			echo $results['district_info']['well_num'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['well_density'], 2); 
+				echo round($results['district_info']['well_density'], 2);
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['well_ratio'], 2); 
+				echo round($results['district_info']['well_ratio'], 2);
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo $results['district_info']['trash_num']; 
+				echo $results['district_info']['trash_num'];
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 			if($results['district_info'] != NULL) {
-				echo round($results['district_info']['risk_ratio'], 2); 
+				echo round($results['district_info']['risk_ratio'], 2);
 			}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo $results['district_info']['hospital_num']; 
+			echo $results['district_info']['hospital_num'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['hospital_ratio'], 2); 
+			echo round($results['district_info']['hospital_ratio'], 2);
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo $results['district_info']['kin_num']; 
+			echo $results['district_info']['kin_num'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['kin_ratio'], 2); 
+			echo round($results['district_info']['kin_ratio'], 2);
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
 			echo $results['district_info']['school_num'];
 		}
 		?>
 	</div>
 	<div class="row-rgtable row-value">
-		<?php 
+		<?php
 		if($results['district_info'] != NULL) {
-			echo round($results['district_info']['school_ratio'], 2); 
+			echo round($results['district_info']['school_ratio'], 2);
 		}
 		?>
 	</div>

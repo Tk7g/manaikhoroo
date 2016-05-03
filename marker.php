@@ -15,7 +15,15 @@ require_once(realpath(dirname(__FILE__))."/classes/Risks.class.php");
 
 session_start();
 
-$action = isset( $_GET['page'] ) ? $_GET['page'] : "";
+header("Access-Control-Allow-Origin: *");
+
+if (isset($_GET['page'])) {
+	$action = $_GET['page'];
+} else if (isset($_POST['page'])) {
+	$action = $_POST['page'];
+} else {
+	$action = '';
+}
 
 switch ( $action ) {
 	case 'getRegionMarkers':
@@ -26,6 +34,10 @@ switch ( $action ) {
 		break;
 	case 'sectionBorder':
 		sectionBorder();
+		break;
+	case 'sectionBorderMega':
+	  // added for homepage
+		sectionBorderMega();
 		break;
 	case 'playgroundBorder':
 		playgroundBorder();
@@ -84,16 +96,53 @@ function playgroundBorder() {
 }
 
 function SectionBorder() {
-	$results = Section::getSectionBorder($_GET['section']);
-	preg_match_all("/\(([^\)]*)\)/", $results['coordinate'], $matches);
-	$data['coordinate'] = array();
-	$k = 0;
-	foreach($matches[1] as $result) {
-		$data['coordinate'][$k] = explode(',', $result, 2);
-		$k = $k + 1;
+	header('Content-type: application/json');
+	if(isset($_GET['sections'])){
+		$resp=[];
+		$sections=explode(',', $_GET['sections']);
+		foreach ($sections as $key => $district_id) {
+			$results = Section::getSectionBorder($district_id);
+			preg_match_all("/\(([^\)]*)\)/", $results['coordinate'], $matches);
+			$data = array();
+			foreach($matches[1] as $k=>$result) {
+				$data[$k] = explode(',', $result, 2);
+			}
+			$resp[$district_id]=$data;
+		}
+		echo json_encode($resp);
+	}
+	else{
+		$results = Section::getSectionBorder($_GET['section']);
+		preg_match_all("/\(([^\)]*)\)/", $results['coordinate'], $matches);
+		$data['coordinate'] = array();
+		$k = 0;
+		foreach($matches[1] as $result) {
+			$data['coordinate'][$k] = explode(',', $result, 2);
+			$k = $k + 1;
+		}
+		echo json_encode($data);
+	}
+
+
+
+}
+
+function SectionBorderMega() {
+	$final = [];
+	foreach($_POST['ids'] as $id) {
+		$results = Section::getSectionBorder($id);
+		preg_match_all("/\(([^\)]*)\)/", $results['coordinate'], $matches);
+		$data['coordinate'] = array();
+		$data['id'] = $id;
+		$k = 0;
+		foreach($matches[1] as $result) {
+			$data['coordinate'][$k] = explode(',', $result, 2);
+			$k = $k + 1;
+		}
+		array_push($final, $data);
 	}
 	header('Content-type: application/json');
-	echo json_encode($data);
+	echo json_encode($final);
 }
 
 function saveMarker() {
@@ -105,7 +154,7 @@ function saveMarker() {
 		if($marker == FALSE) {
 			echo "Хадгалах явцад алдаа гарлаа.";
 		} else {
-			echo "Тэмдэглэгээ амжилттай хадгалагдлаа";	
+			echo "Тэмдэглэгээ амжилттай хадгалагдлаа";
 		}
 	}
 }

@@ -5,7 +5,6 @@ include(SITE_TEMPLATE. "header.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-red.jpg'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="reportBtnRow">
 				<a class="reportBackBtn" href="<?php echo SITE_URL.'report.php?action=reportListBack&district='.$district['id'].'&region='.$region['id'].'&year='.$_GET['year']; ?>">
@@ -152,7 +151,7 @@ include(SITE_TEMPLATE. "header.php");
 									<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/pop-color1.jpg'; ?>" />
 								</div>
 								<div class="reportDetailDesc">
-									<?php 
+									<?php
 										echo number_format($breaks[1], 2).' - '.number_format($breaks[2],2);
 									?>
 								</div>
@@ -214,15 +213,15 @@ include(SITE_TEMPLATE. "header.php");
 	var regionBorder;
 	var iconBus = [];
 	var busCircle = [];
-	
+
 	<?php foreach($regions as $reg) : ?>
 	var regionArea<?php echo $reg['id']; ?>;
 	<?php endforeach; ?>
-	
+
 	<?php foreach($sections as $sec) : ?>
 		var sectionCoord<?php echo $sec['id']; ?> = [];
 	<?php endforeach; ?>
-	
+
 	<?php foreach($roads as $rd) : ?>
 		var rdCoord<?php echo $rd['id']; ?> = [];
 	<?php endforeach; ?>
@@ -239,7 +238,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 <?php
@@ -261,13 +260,13 @@ function initialize() {
 		scaleControl: false,
 		streetViewControl: false,
 		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+
 	};
 	map = new google.maps.Map(document.getElementById('profileMainMap'),
       mapOptions);
 	mapLarge = new google.maps.Map(document.getElementById('reportMapBox'),
       mapOptions1);
-	
+
 	<?php foreach($regions as $reg) : ?>
 	addRegion(<?php echo $district['id'] ?>, <?php echo $reg['id']; ?>);
 	<?php endforeach; ?>
@@ -281,11 +280,11 @@ function initialize() {
 		?>
 		addSection(<?php echo $sec['id']; ?>, '<?php echo $pop_color[$sec['title']]; ?>', mapLarge, 0.5);
 		<?php
-			} 
+			}
 		?>
 	<?php endforeach; ?>
-	<?php 
-		foreach($roads as $rd) : 
+	<?php
+		foreach($roads as $rd) :
 			if($rd['width'] == 6) {
 				$road = 3;
 			} else {
@@ -296,7 +295,7 @@ function initialize() {
 	<?php endforeach; ?>
 	regionBorder(<?php echo $_GET['district']; ?>, <?php echo $_GET['region']; ?>, mapLarge);
 	addMarker(<?php echo $region['id']; ?>, 9, '<?php echo MAIN_FOLDER."/images/reportProfile/hos.png"; ?>', mapLarge, iconBus, <?php echo $_GET['year']; ?>);
-	
+
 	fitBoundary(<?php echo $region['id']; ?>, map);
 <?php
 	if(!in_array($_GET['district'], array(1, 2))) {
@@ -306,23 +305,23 @@ function initialize() {
 <?php }} ?>
 
 	setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#f0e5d8", 400, 0.25, 9, mapLarge);   
+    	addWalk(<?php echo $region['id']; ?>, "#f0e5d8", 400, 0.25, 9, mapLarge);
     }, 1000);
 	setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#cdd3c0", 300, 0.4, 9, mapLarge);    
+    	addWalk(<?php echo $region['id']; ?>, "#cdd3c0", 300, 0.4, 9, mapLarge);
     }, 1500);
 	setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#8ba686", 200, 0.5, 9, mapLarge);    
+    	addWalk(<?php echo $region['id']; ?>, "#8ba686", 200, 0.5, 9, mapLarge);
     }, 2000);
     setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#195734", 100, 0.6, 9, mapLarge);    
+    	addWalk(<?php echo $region['id']; ?>, "#195734", 100, 0.6, 9, mapLarge);
     }, 3000);
-    
+
      google.maps.event.addListener(mapLarge, 'zoom_changed', function() {
-		
+
     	removeMarker(<?php echo $region['id']; ?>, 9, iconBus);
     	addMarker(<?php echo $region['id']; ?>, 9, '<?php echo MAIN_FOLDER."/images/reportProfile/hos.png"; ?>', mapLarge, iconBus, <?php echo $_GET['year']; ?>);
-		
+
   	});
 
 }
@@ -381,7 +380,7 @@ function addMarker(region, type, image, mapVar, iconVar, year) {
 				scaledSize: new google.maps.Size(levelmultiplier, levelmultiplier)
 			}
 			} else {
-			
+
 			var zoomlevel = mapLarge.getZoom();
 			if(zoomlevel < 13) {
 				var subtract = 1;
@@ -396,7 +395,7 @@ function addMarker(region, type, image, mapVar, iconVar, year) {
     			anchor: new google.maps.Point(levelmultiplier,levelmultiplier),
 				scaledSize: new google.maps.Size(levelmultiplier, levelmultiplier)
 			}
-			
+
 			}
 			/*var iconImg = {
 				url: image,
@@ -603,7 +602,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 

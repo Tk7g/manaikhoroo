@@ -5,7 +5,6 @@ include(SITE_TEMPLATE. "header-report2.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-green.jpg'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="profileHeader">
 					<div class="profileCol1">
@@ -156,7 +155,7 @@ include(SITE_TEMPLATE. "header-report2.php");
 									<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/pop-color1.jpg'; ?>" />
 								</div>
 								<div class="reportDetailDesc">
-									<?php 
+									<?php
 										echo number_format($breaks[1], 2).' - '.number_format($breaks[2],2);
 									?>
 								</div>
@@ -219,15 +218,15 @@ include(SITE_TEMPLATE. "header-report2.php");
 	var iconBus = [];
 	var iconLight = [];
 	var busCircle = [];
-	
+
 	<?php foreach($regions as $reg) : ?>
 	var regionArea<?php echo $reg['id']; ?>;
 	<?php endforeach; ?>
-	
+
 	<?php foreach($sections as $sec) : ?>
 		var sectionCoord<?php echo $sec['id']; ?> = [];
 	<?php endforeach; ?>
-	
+
 	<?php foreach($torongarts as $tr) : ?>
 		var torongartsCoord<?php echo $tr['id']; ?> = [];
 	<?php endforeach; ?>
@@ -243,7 +242,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 <?php
@@ -265,13 +264,13 @@ function initialize() {
 		scaleControl: false,
 		streetViewControl: false,
 		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+
 	};
 	map = new google.maps.Map(document.getElementById('profileMainMap'),
       mapOptions);
 	mapLarge = new google.maps.Map(document.getElementById('reportMapBox'),
       mapOptions1);
-      
+
     fitBoundary(<?php echo $region['id']; ?>, map);
 <?php
 	if(!in_array($_GET['district'], array(1, 2))) {
@@ -279,7 +278,7 @@ function initialize() {
 ?>
 	fitBoundary(<?php echo $region['id']; ?>, mapLarge);
 <?php }} ?>
-	
+
 mapLarge.set('styles', [
   {
     featureType: 'road',
@@ -290,20 +289,20 @@ mapLarge.set('styles', [
     ]
   }
 ]);
-	
+
 	setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#f0e5d8", 400, 0.25, 1, mapLarge);   
+    	addWalk(<?php echo $region['id']; ?>, "#f0e5d8", 400, 0.25, 1, mapLarge);
     }, 500);
 	setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#cdd3c0", 300, 0.4, 1, mapLarge);    
+    	addWalk(<?php echo $region['id']; ?>, "#cdd3c0", 300, 0.4, 1, mapLarge);
     }, 1000);
 	setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#8ba686", 200, 0.5, 1, mapLarge);    
+    	addWalk(<?php echo $region['id']; ?>, "#8ba686", 200, 0.5, 1, mapLarge);
     }, 2000);
     setTimeout(function () {
-    	addWalk(<?php echo $region['id']; ?>, "#195734", 100, 0.6, 1, mapLarge);    
+    	addWalk(<?php echo $region['id']; ?>, "#195734", 100, 0.6, 1, mapLarge);
     }, 3000);
-	
+
 	addMarker(<?php echo $region['id']; ?>, 1, '<?php echo MAIN_FOLDER."/images/reportProfile/bus.jpg"; ?>', mapLarge, iconBus);
 	addMarker(<?php echo $region['id']; ?>, 7, '<?php echo MAIN_FOLDER."/images/reportProfile/light.png"; ?>', mapLarge, iconLight);
 	<?php foreach($regions as $reg) : ?>
@@ -560,7 +559,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 

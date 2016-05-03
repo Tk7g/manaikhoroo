@@ -16,8 +16,9 @@ include(SITE_TEMPLATE. "header.php");
 							<div class="selectReportRow">
 								<label>Он</label>
 								<select class="form-control" required="required" name="year" id="yearSelect">
-								<?php 
-									foreach($years as $yr) : 
+									<option value="latest">шинэ</option>
+								<?php
+									foreach($years as $yr) :
 								?>
 									<option value="<?php echo $yr['year'] ?>"><?php echo $yr['year'].' он'; ?></option>
 								<?php endforeach; ?>
@@ -28,22 +29,22 @@ include(SITE_TEMPLATE. "header.php");
 								<select class="form-control" required="required" name="district_id" id="DistrictSelect">
 								<option value="">- Сонгоно уу -</option>
 								<?php
-									$i = 0; 
-									foreach($districts as $district) : 
+									$i = 0;
+									foreach($districts as $district) :
 									$i = $i + 1;
 								?>
 								<option value="<?php echo $district['id'] ?>"><?php echo $i.'. '.$district['title'].' дүүрэг'; ?></option>
 								<?php endforeach; ?>
 								</select>
 							</div>
-							<div id="regionSelect" class="selectReportRow">						
+							<div id="regionSelect" class="selectReportRow">
 							</div>
 						</fieldset>
 					</form>
 				</div>
 				<div class="col-md-8">
 					<div id="reportList">
-						
+
 					</div>
 				</div>
 				</div>
