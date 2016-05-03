@@ -5,7 +5,6 @@ include(SITE_TEMPLATE. "header-report2.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-red.jpg'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="profileHeader">
 					<div class="profileCol1">
@@ -138,7 +137,7 @@ include(SITE_TEMPLATE. "header-report2.php");
 									<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/pop-color1.jpg'; ?>" />
 								</div>
 								<div class="reportDetailDesc">
-									<?php 
+									<?php
 										echo number_format($breaks[1], 2).' - '.number_format($breaks[2],2);
 									?>
 								</div>
@@ -200,11 +199,11 @@ include(SITE_TEMPLATE. "header-report2.php");
 	var regionBorder;
 	var iconBus = [];
 	var busCircle = [];
-	
+
 	<?php foreach($regions as $reg) : ?>
 	var regionArea<?php echo $reg['id']; ?>;
 	<?php endforeach; ?>
-	
+
 	<?php foreach($sections as $sec) : ?>
 		var sectionCoord<?php echo $sec['id']; ?> = [];
 	<?php endforeach; ?>
@@ -221,7 +220,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 <?php
@@ -229,7 +228,7 @@ function initialize() {
 ?>
 		zoom: <?php echo $region['zoom']+1; ?>,
 		center: new google.maps.LatLng(<?php echo $region['center']; ?>),
-<?php } elseif(in_array($_GET['region'], array(9, 10, 13, 15, 16, 18, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 54, 56, 58, 59, 60, 62, 64, 65, 67, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 92, 96, 98, 99, 100, 101, 102, 103, 105, 106, 107, 108, 109, 111, 112, 113, 114, 115, 116, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 135, 136, 137, 138, 139, 142, 143, 146, 148, 150, 151, 152))) { ?> 
+<?php } elseif(in_array($_GET['region'], array(9, 10, 13, 15, 16, 18, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 54, 56, 58, 59, 60, 62, 64, 65, 67, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 92, 96, 98, 99, 100, 101, 102, 103, 105, 106, 107, 108, 109, 111, 112, 113, 114, 115, 116, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 135, 136, 137, 138, 139, 142, 143, 146, 148, 150, 151, 152))) { ?>
 		zoom: <?php echo $region['zoom']+1; ?>,
 		center: new google.maps.LatLng(<?php echo $region['center']; ?>),
 <?php } else { ?>
@@ -242,13 +241,13 @@ function initialize() {
 		scaleControl: false,
 		streetViewControl: false,
 		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+
 	};
 	map = new google.maps.Map(document.getElementById('profileMainMap'),
       mapOptions);
 	mapLarge = new google.maps.Map(document.getElementById('reportMapBox'),
       mapOptions1);
-	  
+
 mapLarge.set('styles', [
   {
     featureType: 'road',
@@ -259,12 +258,12 @@ mapLarge.set('styles', [
     ]
   }
 ]);
-	
+
 	addWalk(<?php echo $region['id']; ?>, "#f0e5d8", 400, 0.25, 9, mapLarge);
 	addWalk(<?php echo $region['id']; ?>, "#cfd4c1", 300, 0.3, 9, mapLarge);
 	addWalk(<?php echo $region['id']; ?>, "#8ba686", 200, 0.4, 9, mapLarge);
 	addWalk(<?php echo $region['id']; ?>, "#195734", 100, 0.3, 9, mapLarge);
-	
+
 	<?php foreach($regions as $reg) : ?>
 	addRegion(<?php echo $district['id'] ?>, <?php echo $reg['id']; ?>);
 	<?php endforeach; ?>
@@ -278,12 +277,12 @@ mapLarge.set('styles', [
 		?>
 		addSection(<?php echo $sec['id']; ?>, '<?php echo $pop_color[$sec['title']]; ?>', mapLarge, 0.5);
 		<?php
-			} 
+			}
 		?>
 	<?php endforeach; ?>
 	regionBorder(<?php echo $_GET['district']; ?>, <?php echo $_GET['region']; ?>, mapLarge);
 	addMarker(<?php echo $region['id']; ?>, 9, '<?php echo MAIN_FOLDER."/images/reportProfile/hos.png"; ?>', mapLarge, iconBus);
-	
+
 	fitBoundary(<?php echo $region['id']; ?>, map);
 <?php
 	if(!in_array($_GET['district'], array(1, 2))) {
@@ -503,7 +502,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 

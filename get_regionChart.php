@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require(realpath(dirname(__FILE__))."/config/settings.php");
 require_once(realpath(dirname(__FILE__))."/classes/Marker.class.php");
@@ -47,8 +47,8 @@ switch ( $_GET['type'] ) {
 <script>
 $(document).ready(function() {
 	var datasets = {
-		<?php 
-		foreach($results['regions'] as $region) : 
+		<?php
+		foreach($results['regions'] as $region) :
 			$regionArea = Marker::getRegionAreaLength($region['id'], $default_year['year']);
 			if($regionArea == NULL) {
 				$regionArea = Marker::getRegionAreaLength($region['id'], $default_year['year']-1);
@@ -59,17 +59,17 @@ $(document).ready(function() {
 		?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php echo $regionArea['area_length']; ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php echo $regionArea['area_length']; ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -77,9 +77,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -105,9 +105,10 @@ $(document).ready(function() {
 					valueLabels: {
 						show: true,
 						align: 'center',
-						font: "9pt 'Arial'"
+						font: "9pt 'Arial'",
+						labelFormatter: Math.round
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -132,9 +133,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="chartTooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -152,7 +153,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#infoChart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -161,7 +162,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/><?php echo $info_title; ?><br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {
@@ -176,23 +177,23 @@ $(document).ready(function() {
 <script>
 $(document).ready(function() {
 	var datasets = {
-		<?php 
-		foreach($results['regions'] as $region) : 
+		<?php
+		foreach($results['regions'] as $region) :
 			$regionTrash = Marker::regionCountYearMarkers($region['id'], $default_year['year'], 10);
 		?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php echo $regionTrash['COUNT(*)']; ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php echo $regionTrash['COUNT(*)']; ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -200,9 +201,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -228,9 +229,10 @@ $(document).ready(function() {
 					valueLabels: {
 						show: true,
 						align: 'center',
-						font: "9pt 'Arial'"
+						font: "9pt 'Arial'",
+						labelFormatter: Math.round
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -255,9 +257,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="chartTooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -275,7 +277,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#infoChart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -284,7 +286,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/><?php echo $info_title; ?><br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {
@@ -299,23 +301,23 @@ $(document).ready(function() {
 <script>
 $(document).ready(function() {
 	var datasets = {
-		<?php 
-		foreach($results['regions'] as $region) : 
+		<?php
+		foreach($results['regions'] as $region) :
 			$regionWell = Marker::regionCountYearMarkers($region['id'], $default_year['year'], 2);
 		?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php echo $regionWell['COUNT(*)']; ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php echo $regionWell['COUNT(*)']; ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -323,9 +325,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -351,9 +353,10 @@ $(document).ready(function() {
 					valueLabels: {
 						show: true,
 						align: 'center',
-						font: "9pt 'Arial'"
+						font: "9pt 'Arial'",
+						labelFormatter: Math.round
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -378,9 +381,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="chartTooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -398,7 +401,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#infoChart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -407,7 +410,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/><?php echo $info_title; ?><br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {
@@ -422,23 +425,23 @@ $(document).ready(function() {
 <script>
 $(document).ready(function() {
 	var datasets = {
-		<?php 
-		foreach($results['regions'] as $region) : 
+		<?php
+		foreach($results['regions'] as $region) :
 			$regionHospital = Marker::regionCountYearMarkers($region['id'], $default_year['year'], 9);
 		?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php echo $regionHospital['COUNT(*)']; ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php echo $regionHospital['COUNT(*)']; ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -446,9 +449,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -474,9 +477,10 @@ $(document).ready(function() {
 					valueLabels: {
 						show: true,
 						align: 'center',
-						font: "9pt 'Arial'"
+						font: "9pt 'Arial'",
+						labelFormatter: Math.round
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -501,9 +505,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="chartTooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -521,7 +525,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#infoChart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -530,7 +534,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/><?php echo $info_title; ?><br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {
@@ -548,17 +552,17 @@ $(document).ready(function() {
 		<?php foreach($results['regions'] as $region) : ?>
 			"<?php echo 'region'.$region['id']; ?>": {
 				label: "<?php echo $region['title']; ?>",
-				data: [["<?php echo $region['title']; ?>", <?php if($results['region_infos'][$region['id']] != NULL) { echo $results['region_infos'][$region['id']][$info_field]; } else { echo 0; } ?>]]	
+				data: [["<?php echo $region['title']; ?>", <?php if($results['region_infos'][$region['id']] != NULL) { echo $results['region_infos'][$region['id']][$info_field]; } else { echo 0; } ?>]]
 			},
 		<?php endforeach; ?>
 	};
-	
+
 	var i = 0;
 		$.each(datasets, function(key, val) {
 			val.color = i;
 			++i;
 	});
-	
+
 	var choiceContainer = $("#district-choices");
 		$.each(datasets, function(key, val) {
 			choiceContainer.append("<div class='region-choice-row'><input type='checkbox' name='" + key +
@@ -566,9 +570,9 @@ $(document).ready(function() {
 				"<label for='id" + key + "'>"
 				+ val.label + "</label></div>");
 	});
-	
+
 	choiceContainer.find("input").click(plotAccordingToChoices);
-	
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -594,9 +598,10 @@ $(document).ready(function() {
 					valueLabels: {
 						show: true,
 						align: 'center',
-						font: "9pt 'Arial'"
+						font: "9pt 'Arial'",
+						labelFormatter: Math.round
 					},
-					grow: { 
+					grow: {
 						active: true,
 						duration: 150
 					}
@@ -621,9 +626,9 @@ $(document).ready(function() {
 			});
 		}
 	}
-	
+
 	plotAccordingToChoices();
-	
+
 	function show_tooltip(x, y, contents) {
        		$('<div id="chartTooltip">' + contents + '</div>').css({
 				'font-size': '13px',
@@ -641,7 +646,7 @@ $(document).ready(function() {
 
 		var previous_point = null;
     	var previous_label = null;
- 		
+
     	$("#infoChart").on("plothover", function (event, pos, item) {
         	if (item) {
             	if ((previous_point != item.dataIndex) || (previous_label != item.series.label)) {
@@ -650,7 +655,7 @@ $(document).ready(function() {
  					$("#population_tooltip").remove();
                 	var y = item.datapoint[1];
                 	var x = item.series.label;
- 
+
                 	show_tooltip(item.pageX, item.pageY, "<div style='text-align: center;'>"+ x +"-р хороо<br/><?php echo $info_title; ?><br /><b><div style='font-size: 20px; color: #EEE;'>" + y + "</div></b></div>");
             	}
         	} else {

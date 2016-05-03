@@ -2,16 +2,12 @@
 	Тэмдэглэгээ
 </div>
 <div class="marker-box-home">
-	<?php 
+	<?php
 		$marker_groups = Marker::getMarkerGroups();
 		$m = 0;
 		foreach($marker_groups as $m_group) :
 	?>
-	<?php if($m_group['id'] == 12) { ?>
-	<div class="markerGroupTab markerGroupTabSpecial" data="<?php echo $m_group['id']; ?>"><?php echo $m_group['title']; ?><i class="fa fa-angle-down"></i></div>
-	<?php } else { ?>
-	<div class="markerGroupTab" data="<?php echo $m_group['id']; ?>"><?php echo $m_group['title']; ?><i class="fa fa-angle-down"></i></div>	
-	<?php } ?>
+	<div class="markerGroupTab" data="<?php echo $m_group['id']; ?>"><?php echo $m_group['title']; ?><i class="fa fa-angle-down"></i></div>
 	<div class="markerGroupSection groupSection<?php echo $m_group['id']; ?>" data="0">
 	<?php
 			$type_markers[$m] = Marker::getGroupMarkers($m_group['id']);
@@ -50,7 +46,7 @@
 			</div>
 		</div>
 	</div>
-	<?php 
+	<?php
 		}
 		if($t_marker['id'] == 2) {
 	?>
@@ -70,7 +66,7 @@
 			</div>
 		</div>
 	</div>
-	<?php		
+	<?php
 		}
 			endforeach;
 			if($m_group['id'] == 1) {
@@ -129,7 +125,7 @@
 			</div>
 		</div>
 	</div>
-	<?php			
+	<?php
 			} elseif($m_group['id'] == 14) {
 	?>
 	<div class="marker-row">
@@ -293,10 +289,10 @@ $('.markerGroupTab').bind('click', function(e){
 	if($('.groupSection'+tabId).attr('data') != 1) {
 		$('.markerGroupSection').each(function(i){
 			$(this).slideUp();
-		});	
+		});
 		$('.markerGroupTab').each(function(i){
 			$(this).removeClass('markerGroupTabSelected');
-		});	
+		});
 		$('.groupSection'+tabId).slideDown();
 		$('.groupSection'+tabId).attr('data', '1');
 		$(this).addClass('markerGroupTabSelected');

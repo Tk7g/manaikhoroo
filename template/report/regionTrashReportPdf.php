@@ -6,7 +6,6 @@ include(SITE_TEMPLATE. "header-report2.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-yellow.jpg'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="profileHeader">
 					<div class="profileCol1">
@@ -123,7 +122,7 @@ include(SITE_TEMPLATE. "header-report2.php");
 									<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/pop-color1.jpg'; ?>" />
 								</div>
 								<div class="reportDetailDesc">
-									<?php 
+									<?php
 										echo number_format($breaks[1], 2).' - '.number_format($breaks[2],2);
 									?>
 								</div>
@@ -158,7 +157,7 @@ include(SITE_TEMPLATE. "header-report2.php");
 								</div>
 							</div>
 							<div id="TrashCollectMap" style="height: 120px; width: 100%;">
-								
+
 							</div>
 						</div>
 					</div>
@@ -196,11 +195,11 @@ include(SITE_TEMPLATE. "header-report2.php");
 	var regionBorder;
 	var iconBus = [];
 	var busCircle = [];
-	
+
 	<?php foreach($regions as $reg) : ?>
 	var regionArea<?php echo $reg['id']; ?>;
 	<?php endforeach; ?>
-	
+
 	<?php foreach($sections as $sec) : ?>
 		var sectionCoord<?php echo $sec['id']; ?> = [];
 	<?php endforeach; ?>
@@ -217,7 +216,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 <?php
@@ -238,7 +237,7 @@ function initialize() {
 		scaleControl: false,
 		streetViewControl: false,
 		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+
 	};
 	var mapCollectOption = {
 		zoom: 8,
@@ -256,11 +255,11 @@ function initialize() {
       mapOptions1);
     mapCollect = new google.maps.Map(document.getElementById('TrashCollectMap'),
       mapCollectOption);
-	
+
 	fitBoundary(<?php echo $region['id']; ?>, map);
 <?php
 	if(!in_array($_GET['district'], array(1, 2))) {
-		if(!in_array($_GET['region'], array(9, 10, 13, 15, 16, 18, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 54, 56, 58, 59, 60, 62, 64, 65, 67, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 92, 96, 98, 99, 100, 101, 102, 103, 105, 106, 107, 108, 109, 111, 112, 113, 114, 115, 116, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 135, 136, 137, 138, 139, 142, 143, 146, 148, 150, 151, 152))) { 
+		if(!in_array($_GET['region'], array(9, 10, 13, 15, 16, 18, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 54, 56, 58, 59, 60, 62, 64, 65, 67, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 92, 96, 98, 99, 100, 101, 102, 103, 105, 106, 107, 108, 109, 111, 112, 113, 114, 115, 116, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 135, 136, 137, 138, 139, 142, 143, 146, 148, 150, 151, 152))) {
 ?>
 	fitBoundary(<?php echo $region['id']; ?>, mapLarge);
 <?php }} ?>
@@ -269,7 +268,7 @@ function initialize() {
 	addRegion(<?php echo $district['id'] ?>, <?php echo $reg['id']; ?>);
 	<?php endforeach; ?>
 	<?php foreach($sections as $sec) : ?>
-		<?php 
+		<?php
 			if($sectionInfo[$sec['title']]['trash_collect'] != NULL) {
 		?>
 			addSection1(<?php echo $sec['id']; ?>, '#ffb940', mapCollect, 1, '<?php echo MAIN_FOLDER.'/img/section/'.$sectionInfo[$sec['title']]['trash_collect'].'.png'; ?>');
@@ -538,7 +537,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 

@@ -1,11 +1,11 @@
-<?php 
-	require(realpath(dirname(__FILE__))."/classes/Region.class.php"); 
-	$regions = Region::getRegionList($_POST);
+<?php
+	require(realpath(dirname(__FILE__))."/classes/Region.class.php");
+	$regions = Region::getRegionList($_POST['district_id']);
 ?>
 <label for="Region">Хороо</label>
 <select class="form-control input-sm" required="required" name="region_id" id="Region">
 	<option value="">- Сонгоно уу -</option>
-	<?php 
+	<?php
 		$i = 0;
 		foreach($regions as $region) :
 		$i = $i + 1;

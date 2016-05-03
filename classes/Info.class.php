@@ -1,10 +1,10 @@
 <?php
-require_once(realpath(dirname(__FILE__))."/../config/config.php"); 
+require_once(realpath(dirname(__FILE__))."/../config/config.php");
 require_once(realpath(dirname(__FILE__))."/../config/Database.class.php");
 define('TABLE_INFOS', "kh_infos");
 
 class Info {
-	
+
 	public static function CityInfo($year) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -13,7 +13,7 @@ class Info {
 		$db->close();
 		return $data;
 	}
-	
+
 	public static function DistrictInfoGet($district, $year) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -24,40 +24,55 @@ class Info {
 	}
 
 	public static function RegionInfo($region, $year) {
+		if ($year == 'latest') {
+			$year = '%';
+		}
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
-		$sql = "SELECT * FROM kh_infos WHERE year = ".$year." AND region_id = ".$region." AND section_id = 0";
+		$sql = "SELECT * FROM kh_infos WHERE year LIKE '".$year."' AND region_id = ".$region." AND section_id = 0 ORDER BY year DESC";
 		$data = $db->query_first($sql);
 		$db->close();
 		return $data;
 	}
-	
+
 	public static function SectionInfo($region, $district, $section, $year) {
+		$extra = '';
+		if ($year == 'latest') {
+			$year = '%';
+			$extra = ' AND population IS NOT NULL AND population > 0';
+			//$extra = $extra . ' AND household IS NOT NULL and household > 0';
+		}
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
-		$sql = "SELECT * FROM kh_infos WHERE year = ".$year." AND region_id = ".$region." AND district_id = ".$district." AND section_id = ".$section."";
+		$sql = "SELECT * FROM kh_infos WHERE region_id = ".$region." AND district_id = ".$district." AND section_id = ".$section." AND year LIKE '".$year."'".$extra." ORDER BY id DESC";
 		$section_data = $db->query_first($sql);
 		$db->close();
 		return $section_data;
 	}
-	
+
 	public static function reportDistrictInfo($district, $year) {
+		$extra = '';
+		if ($year == 'latest') {
+			$year = '%';
+			$extra = ' AND population IS NOT NULL AND population > 0';
+			$extra = $extra . ' AND household IS NOT NULL and household > 0';
+		}
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
-		$sql = "SELECT kh_infos.*, kh_districts.title as district_title FROM ".TABLE_INFOS." 
+		$sql = "SELECT kh_infos.*, kh_districts.title as district_title FROM ".TABLE_INFOS."
 				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id
-				WHERE district_id =".$district." AND region_id IS NULL AND year = ".$year."";
+				WHERE district_id =".$district." AND region_id IS NULL AND year LIKE '".$year."'".$extra." ORDER BY id DESC";
 		$info_district = $db->query_first($sql);
 		$db->close();
 		return $info_district;
 	}
-	
+
 	public static function singleRegionInfo($region) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
 		$year_sql = "SELECT * FROM kh_years WHERE used = 1";
 		$info_year = $db->query_first($year_sql);
-		$sql = "SELECT kh_infos.*, kh_districts.title as district_title, kh_regions.title as region_title FROM ".TABLE_INFOS." 
+		$sql = "SELECT kh_infos.*, kh_districts.title as district_title, kh_regions.title as region_title FROM ".TABLE_INFOS."
 				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id
 				LEFT JOIN kh_regions ON kh_infos.region_id=kh_regions.id
 				WHERE region_id = ".$region." AND year = ".$info_year['year']." AND section_id = 0";
@@ -71,20 +86,20 @@ class Info {
 		$db->connect();
 		$year_sql = "SELECT * FROM kh_years WHERE used = 1";
 		$info_year = $db->query_first($year_sql);
-		$sql = "SELECT kh_infos.*, kh_districts.title as district_title FROM ".TABLE_INFOS." 
+		$sql = "SELECT kh_infos.*, kh_districts.title as district_title FROM ".TABLE_INFOS."
 				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id
 				WHERE district_id =".$district." AND region_id IS NULL AND year = ".$info_year['year']."";
 		$info_district = $db->query_first($sql);
 		$db->close();
 		return $info_district;
 	}
-	
+
 	public function getCityInfo() {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
 		$year_sql = "SELECT * FROM kh_years WHERE used = 1";
 		$info_year = $db->query_first($year_sql);
-		$sql = "SELECT * FROM ".TABLE_INFOS." 
+		$sql = "SELECT * FROM ".TABLE_INFOS."
 					WHERE district_id IS NULL AND region_id IS NULL AND year = ".$info_year['year']."
 					ORDER BY region_id ASC";
 		$info_district = $db->query_first($sql);
@@ -94,7 +109,7 @@ class Info {
 		$results['year'] = $info_year['year'];
 		return $results;
 	}
-	
+
 	public static function getInfo($id) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -103,51 +118,55 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	function getDistricts($db) {
 		$sql = "SELECT * FROM kh_districts ORDER BY title ASC";
 		$districts = $db->fetch_all_array($sql);
 		return $districts;
 	}
-	
+
 	function getRegions($db, $district) {
 		$sql = "SELECT * FROM kh_regions WHERE district_id = ".$district."";
 		$regions = $db->fetch_all_array($sql);
 		return $regions;
 	}
-	
+
 	function getDistrictData($db, $district, $year) {
 		$sql = "SELECT * FROM kh_infos WHERE year = ".$year." AND region_id IS NULL AND district_id = ".$district." AND section_id = 0";
 		$district_data = $db->query_first($sql);
 		return $district_data;
 	}
-	
+
 	function getRegionData($db, $district, $region, $year) {
 		$sql = "SELECT * FROM kh_infos WHERE year = ".$year." AND region_id = ".$region." AND district_id = ".$district." AND section_id = 0";
 		$region_data = $db->query_first($sql);
 		return $region_data;
 	}
-	
+
 	function getCityData($db, $year) {
 		$sql = "SELECT * FROM kh_infos WHERE year = ".$year." AND region_id IS NULL AND district_id IS NULL AND section_id = 0";
 		$city_data = $db->query_first($sql);
 		return $city_data;
 	}
-	
+
 	function markerCount($db, $type, $year, $district, $region) {
+		if ($year == 'latest') {
+			$year = '%';
+		}
 		$sql = "SELECT COUNT(*)
 				FROM kh_markers
-				WHERE type_id = ".$type." AND year = ".$year." AND district_id = ".$district." AND region_id = ".$region."";	
+				WHERE type_id = ".$type." AND year LIKE '".$year."' AND district_id = ".$district." AND region_id = ".$region."
+				ORDER BY id DESC";
 		$results = $db->query_first($sql);
 		return $results['COUNT(*)'];
 	}
-	
+
 	function getSectionData($db, $region, $district, $section, $year) {
 		$sql = "SELECT * FROM kh_infos WHERE year = ".$year." AND region_id = ".$region." AND district_id = ".$district." AND section_id = ".$section."";
 		$section_data = $db->query_first($sql);
 		return $section_data;
 	}
-	
+
 	function getSections($db, $region) {
 		$sql = "SELECT * FROM kh_sections WHERE region_id = ".$region." ORDER BY title ASC";
 		$sections = $db->fetch_all_array($sql);
@@ -160,12 +179,12 @@ class Info {
 				if($sec['title'] != $checkSectionTitle) {
 					$checkSectionTitle = $sec['title'];
 					$sections_to_return[] = $sec;
-				}	
+				}
 			}
 		}
 		return $sections_to_return;
 	}
-	
+
 	public static function cityInfoAdd($year, $info) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -212,8 +231,8 @@ class Info {
 		}
 		$db->close();
 		return $primary_id;
-	} 
-	
+	}
+
 	public static function districtInfoAdd($district, $year, $info) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -261,8 +280,8 @@ class Info {
 		}
 		$db->close();
 		return $primary_id;
-	} 
-	
+	}
+
 	public static function regionInfoAdd($district, $region, $year, $info) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -312,7 +331,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public static function cityInfoEdit($year, $info, $id) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -353,7 +372,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public static function districtInfoEdit($district, $year, $info, $id) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -395,7 +414,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public static function regionInfoEdit($district, $region, $year, $info, $id) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -417,7 +436,7 @@ class Info {
 		} else {
 			$data['household_average'] = 0;
 		}
-		
+
 		/* Газар нутгийн хэмжээ */
 		if($info['area_length'] > 0) {
 			$data['area_length'] = $info['area_length'];
@@ -475,7 +494,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public function sectionInfoAdd($district, $region, $info, $section_area) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -521,7 +540,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public static function sectionInfoEdit($district, $region, $info, $section_area) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -592,11 +611,11 @@ class Info {
 		$data['toron_garts'] = $info['toron_garts'];
 		$data['modified'] = date('Y-m-d H:i:s');
 		$primary_id = $db->query_update(TABLE_INFOS, $data, "id='".$info['id']."'");
-		
+
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public function infoAdd($district, $region, $info) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -678,10 +697,10 @@ class Info {
 				$currentDistrictData['kin_ratio'] = $currentDistrictData['kin_ratio'] + $region_data['kin_ratio'];
 				$currentDistrictData['school_num'] = $currentDistrictData['school_num'] + $region_data['school_num'];
 				$currentDistrictData['tot_schoolnum'] = $currentDistrictData['tot_schoolnum'] + $region_data['tot_schoolnum'];
-				$currentDistrictData['school_ratio'] = $currentDistrictData['school_ratio'] + $region_data['school_ratio'];	
-				$currentDistrictData['pale_ground'] = $currentDistrictData['pale_ground'] + $region_data['pale_ground'];	
-				$currentDistrictData['trash_collect'] = $currentDistrictData['trash_collect'] + $region_data['trash_collect'];	
-				$currentDistrictData['toron_garts'] = $currentDistrictData['toron_garts'] + $region_data['toron_garts'];	
+				$currentDistrictData['school_ratio'] = $currentDistrictData['school_ratio'] + $region_data['school_ratio'];
+				$currentDistrictData['pale_ground'] = $currentDistrictData['pale_ground'] + $region_data['pale_ground'];
+				$currentDistrictData['trash_collect'] = $currentDistrictData['trash_collect'] + $region_data['trash_collect'];
+				$currentDistrictData['toron_garts'] = $currentDistrictData['toron_garts'] + $region_data['toron_garts'];
 				$reg_count = $reg_count + 1;
 			}
 		}
@@ -712,19 +731,19 @@ class Info {
 		foreach($districts as $dist) {
 			$district_data = $this->getDistrictData($db, $dist['id'], $info['year']);
 			if($district_data != NULL) {
-				$districtData['population'] = $districtData['population'] + $district_data['population']; 
-				$districtData['household'] = $districtData['household'] + $district_data['household']; 
-				$districtData['household_average'] = $districtData['household_average'] + $district_data['household_average']; 
-				$districtData['area_length'] = $districtData['area_length'] + $district_data['area_length']; 
-				$districtData['population_density'] = $districtData['population_density'] + $district_data['population_density']; 
-				$districtData['bus_density'] = $districtData['bus_density'] + $district_data['bus_density']; 
-				$districtData['well_num'] = $districtData['well_num'] + $district_data['well_num']; 
-				$districtData['well_density'] = $districtData['well_density'] + $district_data['well_density']; 
-				$districtData['well_ratio'] = $districtData['well_ratio'] + $district_data['well_ratio']; 
-				$districtData['trash_num'] = $districtData['trash_num'] + $district_data['trash_num']; 
-				$districtData['risk_ratio'] = $districtData['risk_ratio'] + $district_data['risk_ratio']; 
-				$districtData['hospital_num'] = $districtData['hospital_num'] + $district_data['hospital_num']; 
-				$districtData['hospital_ratio'] = $districtData['hospital_ratio'] + $district_data['hospital_ratio']; 
+				$districtData['population'] = $districtData['population'] + $district_data['population'];
+				$districtData['household'] = $districtData['household'] + $district_data['household'];
+				$districtData['household_average'] = $districtData['household_average'] + $district_data['household_average'];
+				$districtData['area_length'] = $districtData['area_length'] + $district_data['area_length'];
+				$districtData['population_density'] = $districtData['population_density'] + $district_data['population_density'];
+				$districtData['bus_density'] = $districtData['bus_density'] + $district_data['bus_density'];
+				$districtData['well_num'] = $districtData['well_num'] + $district_data['well_num'];
+				$districtData['well_density'] = $districtData['well_density'] + $district_data['well_density'];
+				$districtData['well_ratio'] = $districtData['well_ratio'] + $district_data['well_ratio'];
+				$districtData['trash_num'] = $districtData['trash_num'] + $district_data['trash_num'];
+				$districtData['risk_ratio'] = $districtData['risk_ratio'] + $district_data['risk_ratio'];
+				$districtData['hospital_num'] = $districtData['hospital_num'] + $district_data['hospital_num'];
+				$districtData['hospital_ratio'] = $districtData['hospital_ratio'] + $district_data['hospital_ratio'];
 				$districtData['kin_num'] = $districtData['kin_num'] + $district_data['kin_num'];
 				$districtData['tot_kinnum'] = $districtData['tot_kinnum'] + $district_data['tot_kinnum'];
 				$districtData['kin_ratio'] = $districtData['kin_ratio'] + $district_data['kin_ratio'];
@@ -760,7 +779,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public function infoEdit($district, $region, $info) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -812,7 +831,7 @@ class Info {
 		$data['created'] = date('Y-m-d H:i:s');
 		$data['modified'] = date('Y-m-d H:i:s');
 		$primary_id = $db->query_update(TABLE_INFOS, $data, "id='".$info['id']."'");
-	
+
 		$regions = $this->getRegions($db, $district);
 		$currentDistrictData = array('population' => 0, 'household' => 0, 'household_average' => 0, 'area_length' => 0, 'population_density' => 0, 'bus_density' => 0, 'well_num' => 0, 'well_density' => 0, 'well_ratio' => 0, 'trash_num' => 0, 'risk_ratio' => 0, 'hospital_num' => 0, 'hospital_ratio' => 0, 'kin_num' => 0, 'tot_kinnum' => 0, 'kin_ratio' => 0, 'school_num' => 0, 'tot_schoolnum' => 0, 'school_ratio' => 0, 'year' => $info['year'], 'district_id' => $district, 'pale_ground' => 0, 'trash_collect' => 0);
 		$reg_count = 0;
@@ -837,10 +856,10 @@ class Info {
 				$currentDistrictData['kin_ratio'] = $currentDistrictData['kin_ratio'] + $region_data['kin_ratio'];
 				$currentDistrictData['school_num'] = $currentDistrictData['school_num'] + $region_data['school_num'];
 				$currentDistrictData['tot_schoolnum'] = $currentDistrictData['tot_schoolnum'] + $region_data['tot_schoolnum'];
-				$currentDistrictData['school_ratio'] = $currentDistrictData['school_ratio'] + $region_data['school_ratio'];	
-				$currentDistrictData['pale_ground'] = $currentDistrictData['pale_ground'] + $region_data['pale_ground'];	
-				$currentDistrictData['trash_collect'] = $currentDistrictData['trash_collect'] + $region_data['trash_collect'];	
-				$currentDistrictData['toron_garts'] = $currentDistrictData['toron_garts'] + $region_data['toron_garts'];	
+				$currentDistrictData['school_ratio'] = $currentDistrictData['school_ratio'] + $region_data['school_ratio'];
+				$currentDistrictData['pale_ground'] = $currentDistrictData['pale_ground'] + $region_data['pale_ground'];
+				$currentDistrictData['trash_collect'] = $currentDistrictData['trash_collect'] + $region_data['trash_collect'];
+				$currentDistrictData['toron_garts'] = $currentDistrictData['toron_garts'] + $region_data['toron_garts'];
 				$reg_count = $reg_count + 1;
 			}
 		}
@@ -871,21 +890,21 @@ class Info {
 		foreach($districts as $dist) {
 			$district_data = $this->getDistrictData($db, $dist['id'], $info['year']);
 			if($district_data != NULL) {
-				$districtData['population'] = $districtData['population'] + $district_data['population']; 
-				$districtData['household'] = $districtData['household'] + $district_data['household']; 
-				$districtData['household_average'] = $districtData['household_average'] + $district_data['household_average']; 
-				$districtData['area_length'] = $districtData['area_length'] + $district_data['area_length']; 
-				$districtData['population_density'] = $districtData['population_density'] + $district_data['population_density']; 
-				$districtData['bus_density'] = $districtData['bus_density'] + $district_data['bus_density']; 
-				$districtData['well_num'] = $districtData['well_num'] + $district_data['well_num']; 
-				$districtData['well_density'] = $districtData['well_density'] + $district_data['well_density']; 
-				$districtData['well_ratio'] = $districtData['well_ratio'] + $district_data['well_ratio']; 
-				$districtData['trash_num'] = $districtData['trash_num'] + $district_data['trash_num']; 
-				$districtData['risk_ratio'] = $districtData['risk_ratio'] + $district_data['risk_ratio']; 
-				$districtData['hospital_num'] = $districtData['hospital_num'] + $district_data['hospital_num']; 
-				$districtData['hospital_ratio'] = $districtData['hospital_ratio'] + $district_data['hospital_ratio']; 
-				$districtData['kin_num'] = $districtData['kin_num'] + $district_data['kin_num']; 
-				$districtData['tot_kinnum'] = $districtData['tot_kinnum'] + $district_data['tot_kinnum']; 
+				$districtData['population'] = $districtData['population'] + $district_data['population'];
+				$districtData['household'] = $districtData['household'] + $district_data['household'];
+				$districtData['household_average'] = $districtData['household_average'] + $district_data['household_average'];
+				$districtData['area_length'] = $districtData['area_length'] + $district_data['area_length'];
+				$districtData['population_density'] = $districtData['population_density'] + $district_data['population_density'];
+				$districtData['bus_density'] = $districtData['bus_density'] + $district_data['bus_density'];
+				$districtData['well_num'] = $districtData['well_num'] + $district_data['well_num'];
+				$districtData['well_density'] = $districtData['well_density'] + $district_data['well_density'];
+				$districtData['well_ratio'] = $districtData['well_ratio'] + $district_data['well_ratio'];
+				$districtData['trash_num'] = $districtData['trash_num'] + $district_data['trash_num'];
+				$districtData['risk_ratio'] = $districtData['risk_ratio'] + $district_data['risk_ratio'];
+				$districtData['hospital_num'] = $districtData['hospital_num'] + $district_data['hospital_num'];
+				$districtData['hospital_ratio'] = $districtData['hospital_ratio'] + $district_data['hospital_ratio'];
+				$districtData['kin_num'] = $districtData['kin_num'] + $district_data['kin_num'];
+				$districtData['tot_kinnum'] = $districtData['tot_kinnum'] + $district_data['tot_kinnum'];
 				$districtData['kin_ratio'] = $districtData['kin_ratio'] + $district_data['kin_ratio'];
 				$districtData['school_num'] = $districtData['school_num'] + $district_data['school_num'];
 				$districtData['tot_schoolnum'] = $districtData['tot_schoolnum'] + $district_data['tot_schoolnum'];
@@ -919,7 +938,7 @@ class Info {
 		$db->close();
 		return $primary_id;
 	}
-	
+
 	public static function infoRegionList($district, $region) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -938,41 +957,41 @@ class Info {
 		$db->close();
 		return $results;
 	}
-	
+
 	public function latestDistrictInfo($limit, $district) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
-		$sql = "SELECT kh_districts.title as district, kh_regions.title as region, kh_infos.created FROM ".TABLE_INFOS." 
-				LEFT JOIN kh_regions ON kh_infos.region_id=kh_regions.id 
-				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id 
-				WHERE kh_infos.district_id = ".$district." 
+		$sql = "SELECT kh_districts.title as district, kh_regions.title as region, kh_infos.created FROM ".TABLE_INFOS."
+				LEFT JOIN kh_regions ON kh_infos.region_id=kh_regions.id
+				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id
+				WHERE kh_infos.district_id = ".$district."
 				ORDER BY kh_infos.created DESC
 				LIMIT ".$limit."";
 		$rows = $db->fetch_all_array($sql);
 		$db->close();
 		return $rows;
-	} 
-	
+	}
+
 	public function latestInfo($limit) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
-		$sql = "SELECT kh_districts.title as district, kh_regions.title as region, kh_infos.created FROM ".TABLE_INFOS." 
-				LEFT JOIN kh_regions ON kh_infos.region_id=kh_regions.id 
-				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id 
+		$sql = "SELECT kh_districts.title as district, kh_regions.title as region, kh_infos.created FROM ".TABLE_INFOS."
+				LEFT JOIN kh_regions ON kh_infos.region_id=kh_regions.id
+				LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id
 				ORDER BY kh_infos.created DESC
 				LIMIT ".$limit."";
 		$rows = $db->fetch_all_array($sql);
 		$db->close();
 		return $rows;
-	} 
-	
+	}
+
 	public static function getDistrictInfo($district) {
     	$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
 		$result = array();
 		$year_sql = "SELECT year FROM kh_years WHERE used = 1";
 		$info_year = $db->query_first($year_sql);
-			$sql = "SELECT * FROM ".TABLE_INFOS." 
+			$sql = "SELECT * FROM ".TABLE_INFOS."
 					LEFT JOIN kh_districts ON kh_infos.district_id=kh_districts.id
 					WHERE district_id LIKE ".$district." AND region_id IS NULL AND section_id LIKE 0 AND year = ".$info_year['year']."";
 		$row = $db->query_first($sql);
@@ -993,14 +1012,14 @@ class Info {
 		$db->close();
 		return $results;
   	}
-	
+
 	public static function getRegionInfo($district, $region) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
 		$result = array();
 		$year_sql = "SELECT year FROM kh_years WHERE used = 1";
 		$info_year = $db->query_first($year_sql);
-		$sql = "SELECT ".TABLE_INFOS.".*, kh_regions.title as region_title, kh_districts.title as district_title FROM ".TABLE_INFOS." 
+		$sql = "SELECT ".TABLE_INFOS.".*, kh_regions.title as region_title, kh_districts.title as district_title FROM ".TABLE_INFOS."
 				LEFT JOIN kh_districts ON ".TABLE_INFOS.".district_id=kh_districts.id
 				LEFT JOIN kh_regions ON ".TABLE_INFOS.".region_id=kh_regions.id
 				WHERE kh_infos.district_id LIKE ".$district." AND kh_infos.region_id LIKE ".$region." AND kh_infos.section_id LIKE 0 AND kh_infos.year = ".$info_year['year']."";
@@ -1022,7 +1041,7 @@ class Info {
 		$db->close();
 		return $results;
 	}
-	
+
 	public static function deleteInfo($id) {
 		$db = new Database( DB_SERVER, DB_USER, DB_PASS, DB_DATABASE );
 		$db->connect();
@@ -1031,7 +1050,7 @@ class Info {
 		$db->close();
 		return $menu;
 	}
-	
-} 
+
+}
 
 ?>

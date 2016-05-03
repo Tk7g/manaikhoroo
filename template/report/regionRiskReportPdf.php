@@ -5,7 +5,6 @@ include(SITE_TEMPLATE. "header-report2.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-orange2.jpg'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="profileHeader">
 					<div class="profileCol1">
@@ -154,7 +153,7 @@ include(SITE_TEMPLATE. "header-report2.php");
 									<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/pop-color1.jpg'; ?>" />
 								</div>
 								<div class="reportDetailDesc">
-									<?php 
+									<?php
 										echo number_format($breaks[1], 2).' - '.number_format($breaks[2],2);
 									?>
 								</div>
@@ -224,15 +223,15 @@ include(SITE_TEMPLATE. "header-report2.php");
 	var iconFuel = [];
 	var iconLight = [];
 	var busCircle = [];
-	
+
 	<?php foreach($risks as $rk) : ?>
 		var riskCoord<?php echo $rk['id']; ?> = [];
 	<?php endforeach; ?>
-	
+
 	<?php foreach($regions as $reg) : ?>
 	var regionArea<?php echo $reg['id']; ?>;
 	<?php endforeach; ?>
-	
+
 	<?php foreach($sections as $sec) : ?>
 		var sectionCoord<?php echo $sec['id']; ?> = [];
 	<?php endforeach; ?>
@@ -248,7 +247,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 <?php
@@ -270,13 +269,13 @@ function initialize() {
 		scaleControl: false,
 		streetViewControl: false,
 		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+
 	};
 	map = new google.maps.Map(document.getElementById('profileMainMap'),
       mapOptions);
 	mapLarge = new google.maps.Map(document.getElementById('reportMapBox'),
       mapOptions1);
-      
+
     fitBoundary(<?php echo $region['id']; ?>, map);
 <?php
 	if(!in_array($_GET['district'], array(1, 2))) {
@@ -284,7 +283,7 @@ function initialize() {
 ?>
 	fitBoundary(<?php echo $region['id']; ?>, mapLarge);
 <?php }} ?>
-	
+
 mapLarge.set('styles', [
   {
     featureType: 'road',
@@ -295,7 +294,7 @@ mapLarge.set('styles', [
     ]
   }
 ]);
-	
+
 	<?php foreach($regions as $reg) : ?>
 	addRegion(<?php echo $district['id'] ?>, <?php echo $reg['id']; ?>);
 	<?php endforeach; ?>
@@ -319,7 +318,7 @@ mapLarge.set('styles', [
 	addMarker(<?php echo $region['id']; ?>, 6, '<?php echo MAIN_FOLDER."/images/reportProfile/crime.png"; ?>', mapLarge, iconBus);
 	addMarker(<?php echo $region['id']; ?>, 15, '<?php echo MAIN_FOLDER."/images/reportProfile/fuel.png"; ?>', mapLarge, iconFuel);
 	addMarker(<?php echo $region['id']; ?>, 5, '<?php echo MAIN_FOLDER."/images/reportProfile/police.png"; ?>', mapLarge, iconLight);
-	
+
 }
 
 function addRisk(section, mapVar) {
@@ -554,7 +553,7 @@ function getCenterOfPolygon(polygon){
 	Hyp = Math.sqrt(X * X + Y * Y)
 	Lat = Math.atan2(Z, Hyp)
 	Lat = Lat * 180/PI
-	Lon = Lon * 180/PI 
+	Lon = Lon * 180/PI
 	return new google.maps.LatLng(Lat,Lon);
 }
 

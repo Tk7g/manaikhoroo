@@ -1,303 +1,132 @@
-<div class="marker-box-title">
-	Тэмдэглэгээ
-</div>
-<div class="marker-box-content">
-	<?php 
-		$marker_groups = Marker::getMarkerGroups();
-		$m = 0;
-		foreach($marker_groups as $m_group) :
-	?>
-	<?php if($m_group['id'] == 12) { ?>
-	<div class="markerGroupTab markerGroupTabSpecial" data="<?php echo $m_group['id']; ?>"><?php echo $m_group['title']; ?><i class="fa fa-angle-down"></i></div>
-	<?php } else { ?>
-	<div class="markerGroupTab" data="<?php echo $m_group['id']; ?>"><?php echo $m_group['title']; ?><i class="fa fa-angle-down"></i></div>	
-	<?php } ?>
-	<div class="markerGroupSection groupSection<?php echo $m_group['id']; ?>" data="0">
-	<?php
-			$type_markers[$m] = Marker::getGroupMarkers($m_group['id']);
-			foreach($type_markers[$m] as $t_marker) :
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="<?php echo $t_marker['image']; ?>" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="<?php echo $t_marker['id']; ?>">
-			</div>
-			<div class="marker-checked" data="<?php echo $t_marker['id']; ?>">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				<?php echo $t_marker['title']; ?>
-			</div>
-		</div>
-	</div>
-	<?php if($t_marker['id'] == 1) { ?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="<?php echo IMG_FOLDER.'icons/25/walk-bus.png'; ?>" />
-		</div>
-		<div class="marker-checker-walk">
-			<div class="marker-checkbox" data="walk-bus">
-			</div>
-			<div class="marker-checked" data="walk-bus">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Автобусны буудлаас 5 минутаас бага хугацаанд алхах зай
-			</div>
-		</div>
-	</div>
-	<?php 
-		}
-		if($t_marker['id'] == 2) {
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="<?php echo IMG_FOLDER.'icons/25/walk-water.png'; ?>" />
-		</div>
-		<div class="marker-checker-walk">
-			<div class="marker-checkbox" data="walk-water">
-			</div>
-			<div class="marker-checked" data="walk-water">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Усны худгаас 5 минутаас бага хугацаанд алхах зай
-			</div>
-		</div>
-	</div>
-	<?php		
-		}
-			endforeach;
-			if($m_group['id'] == 1) {
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/road.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="road-pol">
-			</div>
-			<div class="marker-checked" data="road-pol">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Төв зам
-			</div>
-		</div>
-	</div>
-	<?php
-			} elseif($m_group['id'] == 4) {
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/flood.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="flood-pol">
-			</div>
-			<div class="marker-checked" data="flood-pol">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Үерийн аюултай бүс
-			</div>
-		</div>
-	</div>
-	<?php
-			} elseif($m_group['id'] == 5) {
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/pl.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="pl-pol">
-			</div>
-			<div class="marker-checked" data="pl-pol">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Ногоон байгууламж
-			</div>
-		</div>
-	</div>
-	<?php			
-			} elseif($m_group['id'] == 14) {
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/niislel.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="niislelline">
-			</div>
-			<div class="marker-checked" data="niislelline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Нийслэлийн шугам
-			</div>
-		</div>
-	</div>
-	<!--<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/zhut.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="zhutline">
-			</div>
-			<div class="marker-checked" data="zhutline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				ЗХУТ-ын шугам
-			</div>
-		</div>
-	</div>-->
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/mobinet.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="cableline">
-			</div>
-			<div class="marker-checked" data="cableline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Mobinet шугам
-			</div>
-		</div>
-	</div>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/univision.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="uniline">
-			</div>
-			<div class="marker-checked" data="uniline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Univision шугам
-			</div>
-		</div>
-	</div>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/gmobile.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="gmobileline">
-			</div>
-			<div class="marker-checked" data="gmobileline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Gmobile шугам
-			</div>
-		</div>
-	</div>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/topnet.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="tnline">
-			</div>
-			<div class="marker-checked" data="tnline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				TopNet шугам
-			</div>
-		</div>
-	</div>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/magicnet.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="magicline">
-			</div>
-			<div class="marker-checked" data="magicline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Magicnet шугам
-			</div>
-		</div>
-	</div>
-	<?php	
-			}
-			$m = $m + 1;
-	?>
-	</div>
-	<?php
-		endforeach;
-	?>
-	<div class="marker-row">
-		<div class="marker-image">
-		<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/line1.png" />
-		</div>
-		<div class="marker-checker">
-			<div class="marker-checkbox" data="sectionline">
-			</div>
-			<div class="marker-checked" data="sectionline">
-			</div>
-		</div>
-		<div class="marker-description">
-			<div class="marker-title">
-				Хэсгийн хил
-			</div>
-		</div>
-	</div>
-</div>
 
-<script>
-var tabOpen = 0;
-$('.markerGroupTab').bind('click', function(e){
-	var tabId = $(this).attr('data');
-	if($('.groupSection'+tabId).attr('data') != 1) {
-		$('.markerGroupSection').each(function(i){
-			$(this).slideUp();
-		});	
-		$('.markerGroupTab').each(function(i){
-			$(this).removeClass('markerGroupTabSelected');
-		});	
-		$('.groupSection'+tabId).slideDown();
-		$('.groupSection'+tabId).attr('data', '1');
-		$(this).addClass('markerGroupTabSelected');
-	} else {
-		$('.groupSection'+tabId).slideUp();
-		$('.groupSection'+tabId).attr('data', '0');
-		$(this).removeClass('markerGroupTabSelected');
-	}
-});
-(function($){
-			$(window).load(function(){
-				
-				$(".marker-box-content").mCustomScrollbar({
-					setHeight:640,
-					theme:"light-3"
-				});
-				
-			});
-})(jQuery);
-</script>
+<h3>Тэмдэглэгээ</h3>
+			
+			<?php if($activeDistrict!==null):?>
+				<div class="dsb-content panel panel-default">
+					<div class="panel-body">
+						<?php foreach($results['regions'] as $region) : ?>
+
+							<div class="ds-row">
+								<div class="rs-link" data="<?php echo $region['id']; ?>">
+								<?php echo $region['title']; ?>
+								</div>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			<?php endif;?>
+	
+	
+	
+		<ul class="list-group">
+			<li class="list-group-item colorRow">
+				<div class="color-checker">
+					<div class="color-checkbox" data="pop-density">
+					</div>
+					<div class="color-checked" data="pop-density">
+					</div>
+				</div>
+				<div class="color-description">
+					<div class="color-title">
+						Хүн амын нягтаршил
+					</div>
+				</div>
+			</li>
+			<li class="list-group-item colorRow">
+				<div class="color-checker">
+					<div class="color-checkbox" data="kin-density">
+					</div>
+					<div class="color-checked" data="kin-density">
+					</div>
+				</div>
+				<div class="color-description">
+					<div class="color-title">
+						Цэцэрлэгт хамрагддаггүй [%]
+					</div>
+				</div>
+			</li>
+			<li class="list-group-item colorRow">
+				<div class="color-checker">
+					<div class="color-checkbox" data="school-density">
+					</div>
+					<div class="color-checked" data="school-density">
+					</div>
+				</div>
+				<div class="color-description">
+					<div class="color-title">
+						Сургуульд хамрагддаггүй [%]
+					</div>
+				</div>
+			</li>
+		</ul>
+
+	
+	
+	<div class="panel-group" id="marker-select" role="tablist" aria-multiselectable="true" aria-expanded="false">
+	  <div class="panel panel-default">
+	    
+	    
+		<?php 
+			$marker_groups = Marker::getMarkerGroups();
+			$m = 0;
+			foreach($marker_groups as $m_group) :
+		?>	
+	    <div class="panel-heading" role="tab" id="heading<?php echo $m_group['id'];?>" data="<?php echo $m_group['id']; ?>">
+	      <h4 class="panel-title">
+	        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $m_group['id'];?>" aria-expanded="true" aria-controls="collapse<?php echo $m_group['id'];?>">
+	          <?php echo $m_group['title']; ?> <span class="caret"></span>
+	        </a>
+	      </h4>
+	    </div>
+	    	
+	    <div id="collapse<?php echo $m_group['id'];?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<?php echo $m_group['id'];?>">
+	      <ul class="list-group">
+	      	  <?php
+					$type_markers[$m] = Marker::getGroupMarkers($m_group['id']);
+					foreach($type_markers[$m] as $t_marker) :
+			?>
+			  <li class="list-group-item marker-row">
+			  	<div class="marker-image">
+					<img src="<?php echo $t_marker['image']; ?>" />
+					</div>
+					<div class="marker-checker">
+						<div class="marker-checkbox" data="<?php echo $t_marker['id']; ?>">
+						</div>
+						<div class="marker-checked" data="<?php echo $t_marker['id']; ?>">
+						</div>
+					</div>
+					<div class="marker-description">
+						<div class="marker-title">
+							<?php echo $t_marker['title']; ?>
+						</div>
+					</div>
+			  </li>
+				<?php endforeach;?>
+			</ul>
+	    </div>
+		<?php endforeach;?>
+	  </div>
+	  
+	 
+	  </div>	
+	
+	<div class="panel panel-default">
+		<div class="panel-body">
+		<div class="marker-row">
+			<div class="marker-image">
+			<img src="http://manaikhoroo.ub.gov.mn/webroot/img/icons/25/line1.png" />
+			</div>
+			<div class="marker-checker">
+				<div class="marker-checkbox" data="sectionline">
+				</div>
+				<div class="marker-checked" data="sectionline">
+				</div>
+			</div>
+			<div class="marker-description">
+				<div class="marker-title">
+					Хэсгийн хил
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>

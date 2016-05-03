@@ -1,0 +1,25 @@
+html, body, #map {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: arial, sans-serif;
+}
+
+.edit .leaflet-draw.leaflet-control {
+  display: none;
+}
+
+.leaflet-google-layer {
+  z-index: 0 !important;
+}
+
+.leaflet-draw-edit-edit, .leaflet-draw-edit-remove {
+  display: none !important;
+}
+
+#drawInfoWindow a {
+  color: #fff;
+  cursor: pointer;
+}

@@ -5,16 +5,11 @@ include(SITE_TEMPLATE. "header.php");
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-			<img src="<?php echo MAIN_FOLDER.'/images/reportProfile/bg-green.jpg'; ?>" class="bg-page-image"/>
 			<div class="page-report">
 				<div class="reportBtnRow">
 				<a class="reportBackBtn" href="<?php echo SITE_URL.'report.php?action=reportDistrictListBack&district='.$district['id'].'&year='.$_GET['year']; ?>">
 					<i class="glyphicon glyphicon-arrow-left"></i>
 					<div>Буцах</div>
-				</a>
-				<a class="reportBtn" href="//pdfcrowd.com/url_to_pdf/?width=210mm&height=297mm&use_print_media=1">
-					<i class="glyphicon glyphicon-print"></i>
-					<div>PDF хувилбар</div>
 				</a>
 				<a class="reportPrintBtn" href="javascript:window.print()">
 					<i class="glyphicon glyphicon-print"></i>
@@ -24,10 +19,10 @@ include(SITE_TEMPLATE. "header.php");
 				<div class="profileHeader">
 					<div class="profileCol1">
 						<div class="profileHeaderSub">
-							Хороо
+							дүүрэг
 						</div>
 						<div class="profileHeaderTitle">
-							<?php echo $district['title'].' '.$region['title']; ?>
+							<?php echo $district['title']; ?>
 						</div>
 					</div>
 					<div class="profileCol2">
@@ -213,16 +208,7 @@ include(SITE_TEMPLATE. "header.php");
 	var iconBus = [];
 	var iconLight = [];
 	var busCircle = [];
-	
-	<?php foreach($districts as $dist) : ?>
-		var districtArea<?php echo $dist['id']; ?>;
-	<?php endforeach; ?>
-	
-	<?php foreach($regions as $reg) : ?>
-		var regionCoord<?php echo $sec['id']; ?> = [];
-		var regionArea<?php echo $sec['id']; ?> = [];
-	<?php endforeach; ?>
-	
+
 function initialize() {
 	var mapOptions = {
 		zoom: 8,
@@ -235,7 +221,7 @@ function initialize() {
 		draggable: false,
 		scrollwheel: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		
+
 	};
 	var mapOptions1 = {
 		zoom: <?php echo $district['report_zoom']; ?>,
@@ -245,33 +231,31 @@ function initialize() {
 		zoomControl: false,
 		scaleControl: false,
 		streetViewControl: false,
-		mapTypeId: google.maps.MapTypeId.HYBRID
-		
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+
 	};
-	
+
 	map = new google.maps.Map(document.getElementById('profileMainMap'),
       mapOptions);
 	mapLarge = new google.maps.Map(document.getElementById('reportMapBox'),
       mapOptions1);
-	
+
 	<?php foreach($districts as $dist) : ?>
 		 addDistrict(<?php echo $dist['id']; ?>);
 	<?php endforeach; ?>
 	<?php foreach($regions as $sec) : ?>
 		addRegion(<?php echo $sec['id']; ?>, '<?php echo $pop_color[$sec['id']]; ?>', mapLarge);
 	<?php endforeach; ?>
-	
+
 	addRegionDistrict(<?php echo $district['id']; ?>, mapLarge);
 	//districtBorder(<?php echo $_GET['district']; ?>, mapLarge);
-	
+
 	addWalk(<?php echo $district['id']; ?>, "#195734", 100, 0.5, 1, mapLarge);
 	addWalk(<?php echo $district['id']; ?>, "#8ba686", 200, 0.4, 1, mapLarge);
 	addWalk(<?php echo $district['id']; ?>, "#cfd4c1", 300, 0.3, 1, mapLarge);
 	addWalk(<?php echo $district['id']; ?>, "#f0e5d8", 400, 0.2, 1, mapLarge);
 	addMarker(<?php echo $district['id']; ?>, 1, '<?php echo MAIN_FOLDER."/images/reportProfile/bus.jpg"; ?>', mapLarge, iconBus);
 	addMarker(<?php echo $district['id']; ?>, 7, '<?php echo MAIN_FOLDER."/images/reportProfile/light.png"; ?>', mapLarge, iconLight);
-	
-	fitBoundary(<?php echo $district['id']; ?>, map);
 }
 
 function addWalk(region, color, radius, opacity, type, mapVar) {
@@ -366,32 +350,6 @@ function addRegion(section, color, mapVar) {
 	});
 }
 
-function fitBoundary(region, where) {
-	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=addBorderDistrict&district='+region, function(point){
-		if(point.coordinate.length == 0) {
-			return;
-		} else {
-			var regionCoord = [];
-			var khorooBounds = [];
-			var khorooBounds = new google.maps.LatLngBounds();
-			for(var k = 0; k < point.coordinate.length; k++) {
-				regionCoord[k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
-				khorooBounds.extend(new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]));
-			}
-			boundArea = new google.maps.Polygon({
-				paths: regionCoord,
-				strokeColor: '#28324e',
-				strokeOpacity: 0,
-				strokeWeight: 2,
-				fillColor: '#FFF',
-				fillOpacity: 0
-			});
-			boundArea.setMap(where);
-			myFitBounds(where, khorooBounds);
-		}
-	});
-}
-
 function districtBorder(district, where) {
 	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=addBorderDistrict&district='+district, function(point){
 		if(point.coordinate.length == 0) {
@@ -414,60 +372,20 @@ function districtBorder(district, where) {
 	});
 }
 
-function myFitBounds(myMap, bounds) {
-    myMap.fitBounds(bounds);
-
-    var overlayHelper = new google.maps.OverlayView();
-    overlayHelper.draw = function () {
-        if (!this.ready) {
-            var projection = this.getProjection(),
-                zoom = getExtraZoom(projection, bounds, myMap.getBounds());
-            if (zoom > 0) {
-                myMap.setZoom(myMap.getZoom() + zoom);
-            }
-            this.ready = true;
-            google.maps.event.trigger(this, 'ready');
-        }
-    };
-    overlayHelper.setMap(myMap);
-}
-
-// LatLngBounds b1, b2 -> zoom increment
-function getExtraZoom(projection, expectedBounds, actualBounds) {
-    var expectedSize = getSizeInPixels(projection, expectedBounds),
-        actualSize = getSizeInPixels(projection, actualBounds);
-
-    if (Math.floor(expectedSize.x) == 0 || Math.floor(expectedSize.y) == 0) {
-        return 0;
-    }
-
-    var qx = actualSize.x / expectedSize.x;
-    var qy = actualSize.y / expectedSize.y;
-    var min = Math.min(qx, qy);
-
-    if (min < 1) {
-        return 0;
-    }
-
-    return Math.floor(Math.log(min) / Math.log(2) /* = log2(min) */);
-}
-
-// LatLngBounds bnds -> height and width as a Point
-function getSizeInPixels(projection, bounds) {
-    var sw = projection.fromLatLngToContainerPixel(bounds.getSouthWest());
-    var ne = projection.fromLatLngToContainerPixel(bounds.getNorthEast());
-    return new google.maps.Point(Math.abs(sw.y - ne.y), Math.abs(sw.x - ne.x));
-}
-
 function addDistrict(district) {
 	$.getJSON('<?php echo SITE_URL; ?>indicator.php?action=addBorderDistrict&district='+district, function(point){
 		if(point.coordinate.length == 0) {
 			return;
 		} else {
 			var districtCoord = [];
+			var bounds = new google.maps.LatLngBounds();
 			for(var k = 0; k < point.coordinate.length; k++) {
-				districtCoord[k] = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
+				var pt = new google.maps.LatLng(point.coordinate[k][0], point.coordinate[k][1]);
+				districtCoord.push(pt);
+				bounds.extend(pt);
 			}
+			map.fitBounds(bounds);
+			mapLarge.fitBounds(bounds);
 			if(district == <?php echo $district['id']; ?>) {
 				window['districtArea'+district] = new google.maps.Polygon({
 					paths: districtCoord,
@@ -475,7 +393,8 @@ function addDistrict(district) {
 					strokeOpacity: 1,
 					strokeWeight: 2,
 					fillColor: '#f7c567',
-					fillOpacity: 1
+					fillOpacity: 1,
+					map: map
 				});
 			} else {
 				window['districtArea'+district] = new google.maps.Polygon({
@@ -484,22 +403,13 @@ function addDistrict(district) {
 					strokeOpacity: 1,
 					strokeWeight: 2,
 					fillColor: '#FFF',
-					fillOpacity: 1
+					fillOpacity: 1,
+					map: map
 				});
 			}
-			window['districtArea'+district].setMap(map);
 		}
 	});
 }
-
-function loadScript() {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDK9WxrpaRxS1yhssT0ylOjzF6EFRGxZYI&callback=initialize";
-  document.body.appendChild(script);
-}
-
-window.onload = loadScript();
 
 var barChartData = {
 	labels : [<?php foreach($districts as $dist) { echo '"'.$dist['title'].'",'; } ?>],
@@ -522,6 +432,7 @@ window.onload = function(){
 }
 
 </script>
+<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyDK9WxrpaRxS1yhssT0ylOjzF6EFRGxZYI&callback=initialize"></script>
 
 <?php
 include(SITE_TEMPLATE. "footer.php");
